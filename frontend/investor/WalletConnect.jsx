@@ -19,7 +19,8 @@ export default function WalletConnect({ userId, onConnect }) {
 
   const fetchUserWallet = async () => {
     try {
-      const response = await fetch(`http://localhost:8001/api/users/${userId}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/users/${userId}`);
       if (response.ok) {
         const user = await response.json();
         if (user.wallet_address) {
@@ -61,7 +62,8 @@ export default function WalletConnect({ userId, onConnect }) {
   const saveWalletAddress = async (address) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8001/api/users/${userId}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
+      const response = await fetch(`${apiUrl}/api/users/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ wallet_address: address }),

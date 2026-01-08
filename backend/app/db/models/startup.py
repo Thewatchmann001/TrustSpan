@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime, Boolean, Text
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.db.base import Base
@@ -31,10 +31,30 @@ class Startup(Base):
     vision = Column(String(1000), nullable=True)  # Vision statement
     products_services = Column(String(2000), nullable=True)  # Key products/services
     
+    # Document Verification
+    business_registration_verified = Column(Boolean, default=False)  # Business license verified
+    tax_id_verified = Column(Boolean, default=False)  # Tax ID verified
+    documents_url = Column(String(500), nullable=True)  # URL to verification documents
+    
+    # Founder Profile Verification
+    founder_profile_verified = Column(Boolean, default=False)  # LinkedIn/social proof verified
+    founder_experience_years = Column(Integer, nullable=True)  # Years of founder experience
+    founder_background = Column(Text, nullable=True)  # Founder background/bio
+    
+    # Product/Traction Verification
+    has_mvp = Column(Boolean, default=False)  # Has MVP/working product
+    user_base_count = Column(Integer, default=0)  # Number of active users/customers
+    monthly_revenue = Column(Float, default=0.0)  # Monthly revenue in USDC
+    
+    # Milestone tracking
+    milestones_completed = Column(Integer, default=0)  # Number of business milestones completed
+    last_milestone_date = Column(DateTime, nullable=True)  # Date of last milestone
+    
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
     founder = relationship("User", back_populates="startups")
     jobs = relationship("Job", back_populates="startup")
     investments = relationship("Investment", back_populates="startup")
+    employees = relationship("Employee", back_populates="startup", cascade="all, delete-orphan")
 

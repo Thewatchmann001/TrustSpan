@@ -70,7 +70,7 @@ export default function QuickUpload({ onComplete, onCancel }) {
       formData.append("pdf_file", file);
       formData.append("user_id", user.id.toString());
 
-      const response = await fetch("http://localhost:8001/api/cv/upload-linkedin-pdf", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.93:8000"}/api/cv/upload-linkedin-pdf", {
         method: "POST",
         body: formData,
       });

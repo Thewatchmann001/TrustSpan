@@ -22,7 +22,7 @@ export default function CoverLetterGenerator({ cvData }) {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8001/api/cv/generate-cover-letter", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.93:8000"}/api/cv/generate-cover-letter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

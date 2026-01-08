@@ -25,7 +25,7 @@ export default function JobMatcher({ cvData }) {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8001/api/cv/match-job", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.93:8000"}/api/cv/match-job", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -58,7 +58,7 @@ export default function JobMatcher({ cvData }) {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8001/api/cv/optimize-for-job", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.93:8000"}/api/cv/optimize-for-job", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

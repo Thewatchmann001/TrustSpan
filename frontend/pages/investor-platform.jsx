@@ -32,7 +32,8 @@ export default function InvestorPlatformPage() {
   const fetchPortfolio = async () => {
     if (!user?.id) return;
     try {
-      const response = await fetch(`http://localhost:8001/api/investments/portfolio/${user.id}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/investments/portfolio/${user.id}`);
       if (response.ok) {
         const data = await response.json();
         setPortfolio(data);

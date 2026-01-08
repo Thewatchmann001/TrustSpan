@@ -91,7 +91,8 @@ export default function EuropassCVWizard({ onComplete, onCancel }) {
       
       if (context.length < 10) return;
 
-      const response = await fetch("http://localhost:8001/api/cv/extract-skills", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
+      const response = await fetch(`${apiUrl}/api/cv/extract-skills`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -148,7 +149,8 @@ export default function EuropassCVWizard({ onComplete, onCancel }) {
     // Debounce the API call
     debounceTimerRef.current[field] = setTimeout(async () => {
       try {
-        const response = await fetch("http://localhost:8001/api/cv/field-suggestions", {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
+        const response = await fetch(`${apiUrl}/api/cv/field-suggestions`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -252,7 +254,8 @@ export default function EuropassCVWizard({ onComplete, onCancel }) {
       // Generate CV with AI (optional - can skip if user wants to save directly)
       let generatedCvData = null;
       try {
-        const generateResponse = await fetch("http://localhost:8001/api/cv/generate-from-questions", {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
+        const generateResponse = await fetch(`${apiUrl}/api/cv/generate-from-questions`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(wizardAnswers),
@@ -281,7 +284,8 @@ export default function EuropassCVWizard({ onComplete, onCancel }) {
         photoFormData.append("photo", photoFile);
         photoFormData.append("user_id", user.id.toString());
         
-        const photoResponse = await fetch("http://localhost:8001/api/cv/upload-photo", {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
+        const photoResponse = await fetch(`${apiUrl}/api/cv/upload-photo`, {
           method: "POST",
           body: photoFormData,
         });
@@ -293,7 +297,8 @@ export default function EuropassCVWizard({ onComplete, onCancel }) {
       }
 
       // Save to database
-      const saveResponse = await fetch("http://localhost:8001/api/cv/save", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
+      const saveResponse = await fetch(`${apiUrl}/api/cv/save`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

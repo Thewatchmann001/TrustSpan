@@ -118,7 +118,8 @@ export default function CVBuilderPage() {
   const fetchCV = async () => {
     if (!user?.id) return;
     try {
-      const response = await fetch(`http://localhost:8001/api/cv/${user.id}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
+      const response = await fetch(`${apiUrl}/api/cv/${user.id}`);
       if (response.ok) {
         const data = await response.json();
         setCvData(data);
@@ -162,7 +163,8 @@ export default function CVBuilderPage() {
 
   const handleWizardComplete = async (savedCv) => {
     try {
-      const response = await fetch(`http://localhost:8001/api/cv/${user.id}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
+      const response = await fetch(`${apiUrl}/api/cv/${user.id}`);
       if (response.ok) {
         const fullCv = await response.json();
         setCvData(fullCv);

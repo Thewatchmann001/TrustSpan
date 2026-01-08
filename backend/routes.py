@@ -15,7 +15,7 @@ backend_dir = Path(__file__).parent
 sys.path.insert(0, str(backend_dir))
 
 from app.db.session import get_db
-from app.db.models import User, Startup, Investment, Job
+from app.db.models import User, Startup, Investment, Job, Employee
 from app.core.config import settings
 from app.utils.logger import logger
 from sqlalchemy import func, or_
@@ -29,6 +29,8 @@ from investments.startup_verification import StartupVerification
 from investments.usdc_transactions import USDCTransactions
 from investments.investor_portfolio import InvestorPortfolio
 from app.services.advanced_cv_service import AdvancedCVService
+from app.services.qr_service import QRCodeService
+from app.services.credibility_service import CredibilityService
 from app.blockchain.startup_client import StartupClient
 
 router = APIRouter()
@@ -861,6 +863,64 @@ async def get_startup_details_endpoint(startup_id: str, db: Session = Depends(ge
         )
 
 
+@router.get("/api/startups/{startup_id}/qr")
+async def get_startup_qr_endpoint(startup_id: str, db: Session = Depends(get_db)):
+    """Generate QR code for startup verification."""
+    try:
+        # Verify startup exists
+        startup = db.query(Startup).filter(Startup.startup_id == startup_id).first()
+        if not startup:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Startup {startup_id} not found"
+            )
+        
+        # Generate QR code
+        qr_service = QRCodeService()
+        qr_data = qr_service.generate_startup_qr(startup_id)
+        
+        return qr_data
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating QR code: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate QR code: {str(e)}"
+        )
+
+
+@router.get("/api/startups/{startup_id}/credibility-for-investor")
+async def get_startup_credibility_for_investor(startup_id: str, db: Session = Depends(get_db)):
+    """Get comprehensive credibility breakdown for investors.
+    
+    Shows what's verified, what's missing, risk assessment, and green/red flags.
+    This is specifically designed for investor decision-making.
+    """
+    try:
+        # Verify startup exists by startup_id (string field)
+        startup = db.query(Startup).filter(Startup.startup_id == startup_id).first()
+        if not startup:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Startup {startup_id} not found"
+            )
+        
+        # Get credibility service - pass the database id (int)
+        credibility_service = CredibilityService()
+        credibility_data = credibility_service.get_investor_credibility_view(db, startup.id)
+        
+        return credibility_data
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting investor credibility view: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get credibility information: {str(e)}"
+        )
+
+
 @router.get("/api/startups/by-founder/{founder_id}")
 async def get_startup_by_founder_endpoint(founder_id: int, db: Session = Depends(get_db)):
     """Get startup information by founder/user ID."""
@@ -942,6 +1002,21 @@ class StartupRegisterRequest(BaseModel):
     wallet_address: str
 
 
+class StartupUpdateRequest(BaseModel):
+    """Update startup information for credibility improvement"""
+    founder_experience_years: Optional[int] = None
+    has_mvp: Optional[bool] = None
+    user_base_count: Optional[int] = None
+    monthly_revenue: Optional[float] = None
+    employees_verified: Optional[int] = None
+    website: Optional[str] = None
+    contact_email: Optional[str] = None
+    address: Optional[str] = None
+    business_registration_verified: Optional[bool] = None
+    documents_url: Optional[str] = None
+    founder_profile_verified: Optional[bool] = None
+
+
 @router.post("/api/startups/register")
 async def register_startup_endpoint(
     request: StartupRegisterRequest,
@@ -983,27 +1058,42 @@ async def register_startup_endpoint(
                 "message": "You already have a registered startup"
             }
         
-        # Register startup on blockchain
-        startup_client = StartupClient()
-        blockchain_result = None
-        blockchain_startup_id = None
+        # Generate startup_id immediately (without waiting for slow blockchain call)
+        # Blockchain registration happens in background for better user experience
+        import time
+        blockchain_startup_id = f"STARTUP-{founder.id}-{int(time.time())}"
         transaction_signature = None
         
-        try:
-            blockchain_result = startup_client.register_startup(
-                startup_name=request.name,
-                sector=request.sector,
-                founder_address=request.wallet_address
-            )
-            blockchain_startup_id = blockchain_result.get("startup_id")
-            transaction_signature = blockchain_result.get("transaction_signature")
-            logger.info(f"Startup registered on blockchain: {blockchain_startup_id}")
-        except Exception as e:
-            logger.warning(f"Failed to register startup on blockchain: {str(e)}")
-            # Generate fallback startup_id if blockchain fails
-            import time
-            blockchain_startup_id = f"STARTUP-{founder.id}-{int(time.time())}"
-            transaction_signature = None
+        # Try blockchain registration in background (non-blocking)
+        # This prevents user from waiting for slow blockchain calls (60s+ timeout)
+        def register_on_blockchain_background(startup_db_id, startup_name, sector, founder_address):
+            """Register startup on blockchain in background thread"""
+            try:
+                from app.db.session import SessionLocal
+                db_bg = SessionLocal()
+                try:
+                    startup_client = StartupClient()
+                    blockchain_result = startup_client.register_startup(
+                        startup_name=startup_name,
+                        sector=sector,
+                        founder_address=founder_address
+                    )
+                    # Update startup with blockchain data
+                    startup = db_bg.query(Startup).filter(Startup.id == startup_db_id).first()
+                    if startup:
+                        startup.transaction_signature = blockchain_result.get("transaction_signature")
+                        if blockchain_result.get("startup_id"):
+                            startup.startup_id = blockchain_result.get("startup_id")
+                        db_bg.commit()
+                        logger.info(f"✅ Background blockchain registration complete: {startup.startup_id}")
+                finally:
+                    db_bg.close()
+            except Exception as e:
+                logger.warning(f"⚠️ Background blockchain registration failed: {str(e)}")
+        
+        # Schedule background task (don't wait for it)
+        # Note: In production, use a proper task queue like Celery or RQ
+        import threading
         
         # Create startup in database
         startup = Startup(
@@ -1024,6 +1114,7 @@ async def register_startup_endpoint(
             funding_goal=request.funding_goal,
             pitch_deck_url=request.pitch_deck_url,
             team_size=request.team_size,
+            founder_experience_years=request.founder_experience_years,
             transaction_signature=transaction_signature,
             credibility_score=0.0,
             employees_verified=0
@@ -1034,6 +1125,18 @@ async def register_startup_endpoint(
         db.refresh(startup)
         
         logger.info(f"Startup registered successfully: {startup.id}, startup_id: {startup.startup_id}")
+        
+        # Start background blockchain registration (non-blocking)
+        try:
+            bg_thread = threading.Thread(
+                target=register_on_blockchain_background,
+                args=(startup.id, request.name, request.sector, request.wallet_address),
+                daemon=True
+            )
+            bg_thread.start()
+            logger.info(f"Started background blockchain registration for startup {startup.id}")
+        except Exception as e:
+            logger.warning(f"Failed to start background blockchain registration: {str(e)}")
         
         return {
             "id": startup.id,
@@ -1124,5 +1227,154 @@ async def get_startup_investments_endpoint(startup_id: str, db: Session = Depend
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get startup investments: {str(e)}"
+        )
+
+
+@router.patch("/api/startups/{startup_id}/update-credibility")
+async def update_startup_credibility_fields(
+    startup_id: str,
+    update_data: StartupUpdateRequest,
+    db: Session = Depends(get_db)
+):
+    """Update startup credibility-related fields."""
+    try:
+        startup = db.query(Startup).filter(Startup.startup_id == startup_id).first()
+        if not startup:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Startup {startup_id} not found"
+            )
+        
+        # Update fields if provided
+        if update_data.founder_experience_years is not None:
+            startup.founder_experience_years = update_data.founder_experience_years
+        if update_data.has_mvp is not None:
+            startup.has_mvp = update_data.has_mvp
+        if update_data.user_base_count is not None:
+            startup.user_base_count = update_data.user_base_count
+        if update_data.monthly_revenue is not None:
+            startup.monthly_revenue = update_data.monthly_revenue
+        if update_data.employees_verified is not None:
+            startup.employees_verified = update_data.employees_verified
+        if update_data.website is not None:
+            startup.website = update_data.website
+        if update_data.contact_email is not None:
+            startup.contact_email = update_data.contact_email
+        if update_data.address is not None:
+            startup.address = update_data.address
+        if update_data.business_registration_verified is not None:
+            startup.business_registration_verified = update_data.business_registration_verified
+        if update_data.documents_url is not None:
+            startup.documents_url = update_data.documents_url
+        if update_data.founder_profile_verified is not None:
+            startup.founder_profile_verified = update_data.founder_profile_verified
+        
+        # Recalculate credibility score
+        credibility_service = CredibilityService()
+        credibility_service.calculate_startup_credibility(db, startup.id)
+        db.refresh(startup)
+        
+        db.commit()
+        
+        logger.info(f"Updated credibility fields for startup {startup_id}")
+        return {
+            "success": True,
+            "startup_id": startup.startup_id,
+            "credibility_score": startup.credibility_score,
+            "message": "Credibility fields updated successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating startup credibility: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update startup credibility: {str(e)}"
+        )
+
+
+class AddEmployeeRequest(BaseModel):
+    name: str
+    email: str
+    role: str
+    wallet_address: Optional[str] = None
+    certificate_id: Optional[str] = None
+
+
+@router.post("/api/startups/{startup_id}/add-employee")
+async def add_employee_to_startup(
+    startup_id: str,
+    employee_data: AddEmployeeRequest,
+    db: Session = Depends(get_db)
+):
+    """Add a team member to a startup with optional blockchain verification."""
+    try:
+        startup = db.query(Startup).filter(Startup.startup_id == startup_id).first()
+        if not startup:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Startup {startup_id} not found"
+            )
+        
+        # Create employee record
+        employee = Employee(
+            startup_id=startup.id,
+            name=employee_data.name,
+            email=employee_data.email,
+            role=employee_data.role,
+            wallet_address=employee_data.wallet_address,
+            certificate_id=employee_data.certificate_id,
+            verified_on_chain=False
+        )
+        
+        # If wallet address and certificate ID provided, attempt blockchain verification
+        if employee_data.wallet_address and employee_data.certificate_id:
+            try:
+                startup_client = StartupClient()
+                blockchain_result = startup_client.add_employee(
+                    startup_id=startup_id,
+                    certificate_id=employee_data.certificate_id,
+                    employee_address=employee_data.wallet_address
+                )
+                employee.verified_on_chain = True
+                employee.transaction_signature = blockchain_result.get("transaction_signature")
+                logger.info(f"Employee {employee_data.name} verified on blockchain")
+            except Exception as e:
+                logger.warning(f"Blockchain verification failed for employee {employee_data.name}: {str(e)}")
+                # Continue without blockchain verification - employee still added to database
+        
+        db.add(employee)
+        
+        # Update employees_verified count
+        verified_count = db.query(Employee).filter(
+            Employee.startup_id == startup.id,
+            Employee.verified_on_chain == True
+        ).count()
+        startup.employees_verified = verified_count
+        
+        # Recalculate credibility score
+        credibility_service = CredibilityService()
+        credibility_service.calculate_startup_credibility(db, startup.id)
+        db.refresh(startup)
+        
+        db.commit()
+        
+        logger.info(f"Employee {employee_data.name} added to startup {startup_id}")
+        return {
+            "success": True,
+            "employee_id": employee.id,
+            "verified_on_chain": employee.verified_on_chain,
+            "transaction_signature": employee.transaction_signature,
+            "employees_verified": startup.employees_verified,
+            "credibility_score": startup.credibility_score,
+            "message": "Employee added successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error adding employee: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to add employee: {str(e)}"
         )
 

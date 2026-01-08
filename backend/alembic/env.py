@@ -13,7 +13,7 @@ from app.core.config import settings
 
 # IMPORT ALL MODELS HERE - This is critical for autogenerate to work!
 # Models must be imported so they register with Base.metadata
-from app.db.models import User, Startup, Job, CV, Investment, JobMatch, JobApplication
+from app.db.models import User, Startup, Job, CV, Investment, JobMatch, JobApplication, Conversation, Message, Employee
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

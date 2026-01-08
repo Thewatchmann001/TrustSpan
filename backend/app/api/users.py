@@ -18,9 +18,9 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str
     role: UserRole
-    wallet_address: str = None
-    university: str = None  # Required for job seekers
-    company_name: str = None  # Required for startups
+    wallet_address: Optional[str] = None
+    university: Optional[str] = None  # Required for job seekers
+    company_name: Optional[str] = None  # Required for startups
 
 
 class UserLogin(BaseModel):
@@ -40,9 +40,9 @@ class UserResponse(BaseModel):
     full_name: str
     email: str
     role: str
-    wallet_address: str = None
-    university: str = None
-    company_name: str = None
+    wallet_address: Optional[str] = None
+    university: Optional[str] = None
+    company_name: Optional[str] = None
     verified_on_chain: str = "pending"
     created_at: str
 
@@ -92,7 +92,10 @@ async def register_user(user_data: UserRegister, db: Session = Depends(get_db)):
     verified_on_chain = "pending"
     
     # Convert empty wallet_address to None to avoid unique constraint violations
-    wallet_address = user_data.wallet_address.strip() if user_data.wallet_address and user_data.wallet_address.strip() else None
+    if user_data.wallet_address:
+        wallet_address = user_data.wallet_address.strip() if user_data.wallet_address.strip() else None
+    else:
+        wallet_address = None
     
     # Create user
     hashed_password = get_password_hash(user_data.password)

@@ -3,8 +3,8 @@ from typing import Optional
 
 
 class Settings(BaseSettings):
-    # Database - defaults to SQLite for easier setup, can override with PostgreSQL
-    DATABASE_URL: str = "sqlite:///./trustbridge.db"
+    # Database
+    DATABASE_URL: str = "postgresql://trustbridge:trustbridge@localhost:5432/trustbridgedb"
     
     # JWT
     SECRET_KEY: str = "your-secret-key-change-in-production"
@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     
     # AI Service
     OPENAI_API_KEY: Optional[str] = None  # Deprecated - use MISTRAL_API_KEY
-    MISTRAL_API_KEY: Optional[str] = None
+    MISTRAL_API_KEY: Optional[str] = "GdIifsPZmtuRu16zlwFZpu4jXjxBOI0i"
     
     # Job Search APIs
     # RemoteOK: Free public API - no key needed!
@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "TrustBridge API"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
+    FRONTEND_URL: str = "http://localhost:3000"
     
     # File Uploads
     UPLOAD_DIR: str = "static/uploads"

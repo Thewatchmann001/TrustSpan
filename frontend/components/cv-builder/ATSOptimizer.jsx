@@ -25,7 +25,7 @@ export default function ATSOptimizer({ cvData, onOptimize }) {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8001/api/cv/optimize-ats", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.93:8000"}/api/cv/optimize-ats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv_data: cvData }),

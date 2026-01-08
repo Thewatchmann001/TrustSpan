@@ -31,9 +31,9 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   
-  // Auto-generate Solana wallet on mount if not provided
+  // Only auto-generate wallet for investors and startups (not for job seekers/students)
   useEffect(() => {
-    if (!formData.wallet_address && mounted) {
+    if (!formData.wallet_address && mounted && (formData.role === 'investor' || formData.role === 'startup' || formData.role === 'founder')) {
       try {
         const keypair = Keypair.generate();
         const walletAddress = keypair.publicKey.toBase58();
@@ -43,7 +43,7 @@ export default function Register() {
         console.error("Failed to generate wallet:", error);
       }
     }
-  }, [mounted]);
+  }, [mounted, formData.role]);
 
   // Fix hydration mismatch - only show dynamic content after mount
   useEffect(() => {
@@ -69,29 +69,39 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
 
-    // Convert empty wallet_address to null to avoid unique constraint violations
-    const submitData = {
-      ...formData,
-      wallet_address: formData.wallet_address?.trim() || null,
-    };
+    try {
+      // Convert empty wallet_address to null to avoid unique constraint violations
+      const submitData = {
+        ...formData,
+        wallet_address: formData.wallet_address?.trim() || null,
+      };
 
-    const result = await register(submitData);
-    
-    if (result.success) {
-      toast.success("Registration successful!");
-      // Redirect based on user role
-      if (formData.role === "founder" || formData.role === "startup") {
-        router.push("/startup/dashboard");
-      } else if (formData.role === "investor") {
-        router.push("/investor/dashboard");
+      console.log('📝 Submitting registration...', { email: submitData.email, role: submitData.role });
+      const result = await register(submitData);
+      
+      console.log('📬 Registration result:', result);
+      
+      if (result.success) {
+        toast.success("Registration successful!");
+        // Redirect based on user role
+        if (formData.role === "founder" || formData.role === "startup") {
+          router.push("/startup-dashboard");
+        } else if (formData.role === "investor") {
+          router.push("/investor-platform");
+        } else {
+          router.push("/cv-builder");
+        }
       } else {
-        router.push("/student/dashboard");
+        const errorMsg = result.error || "Registration failed";
+        console.error('❌ Registration failed:', errorMsg);
+        toast.error(errorMsg);
+        setLoading(false);
       }
-    } else {
-      toast.error(result.error || "Registration failed");
+    } catch (error) {
+      console.error('❌ Unexpected error during registration:', error);
+      toast.error(`Registration failed: ${error.message || 'Unknown error'}`);
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
@@ -268,9 +278,6 @@ export default function Register() {
                     <option value="Other">Other</option>
                   </select>
                 </div>
-                <p className="text-xs text-blue-600 mt-1 font-medium">
-                  Your university will be verified on blockchain
-                </p>
               </motion.div>
             )}
 
@@ -316,27 +323,46 @@ export default function Register() {
             >
               <label className="block text-sm font-bold text-blue-900 mb-2">
                 Solana Wallet Address{" "}
-                <span className="text-xs font-normal text-green-600">
-                  (Auto-generated)
-                </span>
+                {formData.role !== "student" && (
+                  <span className="text-xs font-normal text-green-600">
+                    (Auto-generated)
+                  </span>
+                )}
               </label>
               <div className="relative">
                 <Wallet className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 w-5 h-5 z-10" />
                 <input
                   type="text"
                   value={formData.wallet_address}
-                  readOnly
-                  className="input-field pl-10 bg-gray-50 text-gray-700 cursor-not-allowed"
-                  placeholder={formData.wallet_address ? "" : "Generating wallet..."}
+                  readOnly={formData.role !== "student"}
+                  onChange={(e) => {
+                    if (formData.role === "student") {
+                      setFormData({ ...formData, wallet_address: e.target.value });
+                    }
+                  }}
+                  className={`input-field pl-10 ${
+                    formData.role !== "student" 
+                      ? "bg-gray-50 text-gray-700 cursor-not-allowed" 
+                      : ""
+                  }`}
+                  placeholder={
+                    formData.role === "student"
+                      ? "Optional: Enter wallet address or leave empty"
+                      : formData.wallet_address
+                      ? ""
+                      : "Generating wallet..."
+                  }
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                A Solana wallet has been automatically created for you.
-              </p>
+              {formData.role !== "student" && (
+                <p className="text-xs text-gray-500 mt-1">
+                  A Solana wallet has been automatically created for you.
+                </p>
+              )}
               <p className="text-xs text-blue-600 mt-1 font-medium">
                 {formData.role === "founder" || formData.role === "investor"
                   ? "Required for founders and investors"
-                  : "Optional for job seekers"}
+                  : "Optional for job seekers - you can leave this empty"}
               </p>
             </motion.div>
 

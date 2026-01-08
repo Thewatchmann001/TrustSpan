@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { LogIn, Mail } from 'lucide-react';
+import { LogIn, Mail, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import Logo from '../components/Logo';
@@ -43,11 +43,11 @@ export default function Login() {
       // Redirect based on user role
       const role = result.user?.role || 'student';
       if (role === 'founder' || role === 'startup') {
-        router.push('/startup/dashboard');
+        router.push('/startup-dashboard');
       } else if (role === 'investor') {
-        router.push('/investor/dashboard');
+        router.push('/investor-platform');
       } else {
-        router.push('/student/dashboard');
+        router.push('/cv-builder');
       }
     } else {
       toast.error(result.error || 'Login failed');
@@ -73,6 +73,14 @@ export default function Login() {
           transition={{ duration: 0.6 }}
           className="card premium-shadow-lg"
         >
+          {/* Back Button */}
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4 -mt-2 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-medium">Back</span>
+          </button>
           {/* Logo */}
           <div className="text-center mb-8">
             <motion.div

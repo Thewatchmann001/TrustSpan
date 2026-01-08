@@ -50,7 +50,8 @@ export default function StartupListEnhanced({ onStartupSelect }) {
       if (filterSector !== "all") {
         params.append("sector", filterSector);
       }
-      const response = await fetch(`http://localhost:8001/api/startups/list?${params}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/startups/list?${params}`);
       const data = await response.json();
       setStartups(data.startups || []);
     } catch (error) {

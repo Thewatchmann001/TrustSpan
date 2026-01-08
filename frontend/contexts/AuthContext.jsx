@@ -125,13 +125,60 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
+      console.log('📝 Registering user...', userData.email);
       const response = await authAPI.register(userData);
-      // Auto-login after registration
-      return await login(userData.email, userData.password);
+      console.log('✅ Registration successful, attempting auto-login...');
+      
+      // Auto-login after registration (with timeout handling)
+      try {
+        const loginResult = await login(userData.email, userData.password);
+        return loginResult;
+      } catch (loginError) {
+        console.error('⚠️ Auto-login failed, but registration succeeded:', loginError);
+        // Return success even if auto-login fails - user can login manually
+        return {
+          success: true,
+          user: response.data,
+          message: 'Registration successful. Please login.'
+        };
+      }
     } catch (error) {
+      console.error('❌ Registration error:', error);
+      
+      // Handle network errors
+      if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+        return {
+          success: false,
+          error: 'Request timed out. Please check your connection and try again.'
+        };
+      }
+      
+      if (!error.response) {
+        return {
+          success: false,
+          error: 'Cannot connect to server. Please make sure the backend is running.'
+        };
+      }
+      
+      // Handle Pydantic validation errors
+      const errorDetail = error.response?.data?.detail;
+      let errorMessage = 'Registration failed';
+      
+      if (Array.isArray(errorDetail)) {
+        // Format validation errors into a readable message
+        errorMessage = errorDetail.map(err => {
+          const field = err.loc ? err.loc.join('.') : 'field';
+          return `${field}: ${err.msg}`;
+        }).join(', ');
+      } else if (typeof errorDetail === 'string') {
+        errorMessage = errorDetail;
+      } else if (errorDetail?.message) {
+        errorMessage = errorDetail.message;
+      }
+      
       return { 
         success: false, 
-        error: error.response?.data?.detail || 'Registration failed' 
+        error: errorMessage
       };
     }
   };

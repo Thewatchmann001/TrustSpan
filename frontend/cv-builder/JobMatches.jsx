@@ -21,7 +21,8 @@ export default function JobMatches({ userId }) {
   const fetchJobMatches = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8001/api/jobs/match?user_id=${userId}&limit=10`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
+      const response = await fetch(`${apiUrl}/api/jobs/match?user_id=${userId}&limit=10`);
       const data = await response.json();
       setMatches(data.matches || []);
     } catch (error) {
@@ -33,7 +34,8 @@ export default function JobMatches({ userId }) {
 
   const fetchGlobalJobs = async () => {
     try {
-      const response = await fetch(`http://localhost:8001/api/jobs/search-global?query=software engineer&limit=10`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
+      const response = await fetch(`${apiUrl}/api/jobs/search-global?query=software engineer&limit=10`);
       const data = await response.json();
       setGlobalJobs(data.jobs || []);
     } catch (error) {
