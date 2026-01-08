@@ -1,55 +1,43 @@
-from fastapi import HTTPException, status
+"""
+Custom exceptions for TrustBridge backend
+"""
 
 
-class TrustBridgeException(HTTPException):
-    """Base exception for TrustBridge API."""
+class TrustBridgeException(Exception):
+    """Base exception for TrustBridge application."""
     pass
 
 
-class CertificateNotFound(TrustBridgeException):
-    def __init__(self, certificate_id: str):
-        super().__init__(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Certificate {certificate_id} not found"
-        )
+class BlockchainError(TrustBridgeException):
+    """Exception raised for blockchain-related errors."""
+    pass
 
 
-class StartupNotFound(TrustBridgeException):
-    def __init__(self, startup_id: str):
-        super().__init__(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Startup {startup_id} not found"
-        )
+class AIServiceError(TrustBridgeException):
+    """Exception raised for AI service errors."""
+    pass
+
+
+class ValidationError(TrustBridgeException):
+    """Exception raised for validation errors."""
+    pass
+
+
+class AuthenticationError(TrustBridgeException):
+    """Exception raised for authentication errors."""
+    pass
+
+
+class AuthorizationError(TrustBridgeException):
+    """Exception raised for authorization errors."""
+    pass
+
+
+class InvalidCredentials(AuthenticationError):
+    """Exception raised for invalid credentials."""
+    pass
 
 
 class UserNotFound(TrustBridgeException):
-    def __init__(self, user_id: int):
-        super().__init__(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User {user_id} not found"
-        )
-
-
-class InvalidCredentials(TrustBridgeException):
-    def __init__(self):
-        super().__init__(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
-        )
-
-
-class BlockchainError(TrustBridgeException):
-    def __init__(self, message: str):
-        super().__init__(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Blockchain error: {message}"
-        )
-
-
-class UnauthorizedAccess(TrustBridgeException):
-    def __init__(self, message: str = "Unauthorized access"):
-        super().__init__(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=message
-        )
-
+    """Exception raised when user is not found."""
+    pass

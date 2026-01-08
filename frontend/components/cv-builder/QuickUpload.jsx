@@ -151,11 +151,53 @@ export default function QuickUpload({ onComplete, onCancel }) {
           {jobMatches.length > 0 && (
             <div className="mb-6">
               <h3 className="font-semibold text-gray-900 mb-3">Top Job Matches</h3>
-              <div className="space-y-2">
-                {jobMatches.slice(0, 3).map((job, idx) => (
-                  <div key={idx} className="bg-white border border-gray-200 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900">{job.title}</h4>
-                    <p className="text-sm text-gray-600">{job.company} • {job.location}</p>
+              <div className="space-y-3">
+                {jobMatches.slice(0, 5).map((job, idx) => (
+                  <div key={idx} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-medium text-gray-900 flex-1">{job.title}</h4>
+                      {/* Source Badge with distinct colors */}
+                      {job.source && (
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                          job.source === 'RemoteOK' 
+                            ? 'bg-green-100 text-green-700' 
+                            : job.source === 'Freelancer.com'
+                            ? 'bg-purple-100 text-purple-700'
+                            : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          {job.source}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{job.company} • {job.location}</p>
+                    
+                    {/* Job type and salary */}
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {job.type && (
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                          {job.type}
+                        </span>
+                      )}
+                      {job.salary && (
+                        <span className="text-xs bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded font-medium">
+                          💰 {job.salary}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Skills preview */}
+                    {job.skills && job.skills.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {job.skills.slice(0, 4).map((skill, skillIdx) => (
+                          <span key={skillIdx} className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded">
+                            {skill}
+                          </span>
+                        ))}
+                        {job.skills.length > 4 && (
+                          <span className="text-xs text-gray-400">+{job.skills.length - 4} more</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

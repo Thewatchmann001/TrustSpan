@@ -18,7 +18,7 @@ from app.db.session import get_db
 from app.db.models import User, Startup, Investment, Job, Employee
 from app.core.config import settings
 from app.utils.logger import logger
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, String
 
 from cv.cv_generator import CVGenerator
 from cv.ats_optimizer import ATSOptimizer

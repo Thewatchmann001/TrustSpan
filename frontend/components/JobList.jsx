@@ -149,14 +149,30 @@ export default function JobList({ keywords = [], jobTitles = [], location = null
                 <span className="text-gray-600 text-sm">{job.location || 'Location not specified'}</span>
               </div>
 
-              {/* Source Badge */}
-              {job.source && (
-                <div className="mb-3">
-                  <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">
+              {/* Source Badge & Type */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                {job.source && (
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                    job.source === 'RemoteOK' 
+                      ? 'bg-green-100 text-green-700' 
+                      : job.source === 'Freelancer.com'
+                      ? 'bg-purple-100 text-purple-700'
+                      : 'bg-blue-100 text-blue-700'
+                  }`}>
                     {job.source}
                   </span>
-                </div>
-              )}
+                )}
+                {job.type && (
+                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                    {job.type}
+                  </span>
+                )}
+                {job.salary && (
+                  <span className="text-xs bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded font-medium">
+                    💰 {job.salary}
+                  </span>
+                )}
+              </div>
 
               {/* Description */}
               <p className="text-gray-600 text-sm mb-4 line-clamp-3">

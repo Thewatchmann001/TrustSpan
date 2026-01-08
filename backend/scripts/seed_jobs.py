@@ -231,13 +231,9 @@ def seed_jobs():
     try:
         print("🌱 Seeding jobs database...")
         
-        # Get all startups
+        # Get all startups (optional)
         startups = db.query(Startup).all()
-        if not startups:
-            print("⚠️  No startups found. Please seed startups first.")
-            return
-        
-        print(f"Found {len(startups)} startups")
+        print(f"Found {len(startups)} startups (can proceed without)")
         
         # Generate jobs
         target_count = 350

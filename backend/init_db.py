@@ -6,8 +6,9 @@ import os
 # Add backend to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from app.database import engine, Base
-from app.models import User, CV, Job, Certificate, Startup, Investment
+from app.db.session import engine
+from app.db.base import Base
+from app.db.models import User, CV, Job, Startup, Investment, JobMatch, JobApplication
 
 def init_db():
     print("🔧 Initializing TrustBridge database...")

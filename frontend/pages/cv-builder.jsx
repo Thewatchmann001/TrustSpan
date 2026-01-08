@@ -192,7 +192,8 @@ export default function CVBuilderPage() {
           <QuickUpload
             onComplete={(result) => {
               fetchCV();
-              setActiveTab("job-match");
+              setActiveTab("editor");
+              setShowJobMatch(true);
               toast.success("CV saved! Showing job matches");
             }}
             onCancel={() => {

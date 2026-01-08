@@ -29,7 +29,9 @@ class Settings(BaseSettings):
     
     # Job Search APIs
     # RemoteOK: Free public API - no key needed!
-    # Freelancer.com: OAuth required (to be implemented)
+    # Freelancer.com: OAuth token required
+    FREELANCER_OAUTH_TOKEN: Optional[str] = None
+    FREELANCER_SANDBOX: bool = False  # Set to True for testing
     
     # App
     APP_NAME: str = "TrustBridge API"

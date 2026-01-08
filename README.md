@@ -69,9 +69,8 @@ _Connecting Talent with Opportunity | Empowering Global Investments_
 
 ### Job Matching
 
-- ✅ RemoteOK integration (free public API - 1000+ remote jobs)
-- ✅ Freelancer.com support (OAuth pending)
-- ✅ Database-powered job search (364+ curated jobs)
+- ✅ **RemoteOK integration** (free public API - real remote jobs)
+- ✅ **Freelancer.com integration** (OAuth - freelance gigs & projects)
 - ✅ AI-powered matching algorithm
 - ✅ CV-based automatic keyword extraction
 - ✅ Location-based filtering
@@ -122,7 +121,7 @@ _Connecting Talent with Opportunity | Empowering Global Investments_
 
 ### AI & Machine Learning
 
-- **AI Service**: [OpenAI GPT](https://openai.com/)
+- **AI Service**: [Mistral AI](https://mistral.ai/) (mistral-medium-latest)
 - **NLP**: Custom matching algorithms
 - **CV Analysis**: ATS optimization and scoring
 
@@ -279,14 +278,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 # Solana
 SOLANA_RPC_URL=https://api.devnet.solana.com
 
-# AI Service (Optional)
-OPENAI_API_KEY=your-openai-api-key
-# AI Service (Mistral AI)
+# AI Service (Mistral AI - for CV parsing)
 MISTRAL_API_KEY=your-mistral-api-key
 
 # Job Search - No API keys needed!
 # RemoteOK: Free public API
-# Freelancer.com: OAuth (to be implemented)
 ```
 
 ### Frontend Configuration
@@ -381,11 +377,8 @@ alembic upgrade head
 cd backend
 source venv/bin/activate
 
-# Seed initial data (users, startups, jobs)
-python scripts/seed_database.py
-
-# Seed jobs (300-400 jobs)
-python scripts/seed_jobs.py
+# Initialize database tables
+python init_db.py
 ```
 
 ### Sample Data
@@ -394,7 +387,6 @@ The seed scripts create:
 
 - Sample users (job seekers, startups, investors)
 - Sample startups with verification
-- 364+ job listings
 - Sample investments
 
 **Default Login Credentials:**

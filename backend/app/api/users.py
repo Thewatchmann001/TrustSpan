@@ -43,8 +43,8 @@ class UserResponse(BaseModel):
     wallet_address: Optional[str] = None
     university: Optional[str] = None
     company_name: Optional[str] = None
-    verified_on_chain: str = "pending"
-    created_at: str
+    verified_on_chain: Optional[str] = "pending"
+    created_at: Optional[str] = None
 
     class Config:
         from_attributes = True
