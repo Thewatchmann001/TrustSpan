@@ -3,12 +3,19 @@ import { AuthProvider } from "../contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 import Layout from "../components/Layout";
 import Head from "next/head";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // Privy is disabled - using only local AuthContext
 const PRIVY_ENABLED = false;
 
 function MyApp({ Component, pageProps }) {
+  // Fix hydration by only rendering on client
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Register Service Worker for PWA (only in production)
   useEffect(() => {
     // Skip service worker in development to avoid Fast Refresh issues
@@ -89,6 +96,18 @@ function MyApp({ Component, pageProps }) {
       setTimeout(() => clearInterval(checkPrivyScripts), 10000);
     }
   }, []);
+
+  // Show loading while client mounts (prevents hydration mismatch)
+  if (!mounted) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f4f8' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="animate-spin" style={{ width: 40, height: 40, border: '3px solid #ddd', borderTop: '3px solid #0A66C2', borderRadius: '50%', margin: '0 auto' }}></div>
+          <p style={{ marginTop: 16, color: '#666' }}>Loading TrustBridge...</p>
+        </div>
+      </div>
+    );
+  }
 
   const coreApp = (
     <AuthProvider>

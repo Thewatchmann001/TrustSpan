@@ -117,6 +117,7 @@ export default function CVBuilderPage() {
 
   const fetchCV = async () => {
     if (!user?.id) return;
+    setLoading(true);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
       const response = await fetch(`${apiUrl}/api/cv/${user.id}`);
@@ -134,6 +135,8 @@ export default function CVBuilderPage() {
       console.error("Failed to fetch CV:", error);
       setCvData(null);
       setActiveTab("wizard");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -352,7 +355,11 @@ export default function CVBuilderPage() {
         return <JobApplicationTracker userId={user?.id} />;
 
       default:
-        return null;
+        return (
+          <div className="card p-6 text-center">
+            <p className="text-gray-600">Select a feature from the sidebar</p>
+          </div>
+        );
     }
   };
 

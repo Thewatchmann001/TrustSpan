@@ -89,7 +89,7 @@ export default function EuropassCVWizard({ onComplete, onCancel }) {
       
       const context = `${experienceText} ${educationText}`.trim();
       
-      if (context.length < 10) return;
+      if (context.length < 20) return; // Require more content before fetching
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.100.93:8000';
       const endpoint = apiUrl + "/api/cv/extract-skills";
@@ -121,7 +121,7 @@ export default function EuropassCVWizard({ onComplete, onCancel }) {
     if (cvData && (cvData.experience?.length > 0 || cvData.education?.length > 0)) {
       const timer = setTimeout(() => {
         fetchSkillSuggestions();
-      }, 1000);
+      }, 2000); // 2 second delay for skill suggestions
       return () => clearTimeout(timer);
     }
   }, [cvData?.experience?.length, cvData?.education?.length, fetchSkillSuggestions]);
@@ -181,35 +181,21 @@ export default function EuropassCVWizard({ onComplete, onCancel }) {
       } finally {
         setLoadingSuggestions(prev => ({ ...prev, [field]: false }));
       }
-    }, 800); // 800ms debounce
+    }, 1500); // 1500ms debounce for better performance
   }, [currentStep, cvData]);
 
-  // Proactive suggestions when step changes - fetch initial suggestions for empty fields
-  useEffect(() => {
-    const currentSection = STEPS[currentStep - 1]?.section;
-    if (!currentSection) return;
-
-    // Fetch initial suggestions for the current step's main field after a short delay
-    const timer = setTimeout(() => {
-      if (currentSection === "summary" && (!cvData.summary || cvData.summary.length < 10)) {
-        // Fetch proactive suggestions for summary even if empty
-        fetchSuggestions("summary", cvData.summary || "", { 
-          cvData, 
-          step: currentStep,
-          proactive: true 
-        }, true);
-      } else if (currentSection === "personal_info" && !cvData.personal_info.address) {
-        // Fetch suggestions for address field
-        fetchSuggestions("personal_info.address", "", { 
-          cvData, 
-          step: currentStep,
-          proactive: true 
-        }, true);
-      }
-    }, 1000); // Wait 1 second after step change
-
-    return () => clearTimeout(timer);
-  }, [currentStep, fetchSuggestions]);
+  // DISABLED: Proactive suggestions cause too many API calls and slow down the UI
+  // Users can still trigger suggestions manually by typing in fields
+  // useEffect(() => {
+  //   const currentSection = STEPS[currentStep - 1]?.section;
+  //   if (!currentSection) return;
+  //   const timer = setTimeout(() => {
+  //     if (currentSection === "summary" && (!cvData.summary || cvData.summary.length < 10)) {
+  //       fetchSuggestions("summary", cvData.summary || "", { cvData, step: currentStep, proactive: true }, true);
+  //     }
+  //   }, 1000);
+  //   return () => clearTimeout(timer);
+  // }, [currentStep, fetchSuggestions]);
 
   const handleNext = () => {
     if (currentStep < STEPS.length) {

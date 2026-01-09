@@ -69,8 +69,10 @@ _Connecting Talent with Opportunity | Empowering Global Investments_
 
 ### Job Matching
 
-- ✅ **RemoteOK integration** (free public API - real remote jobs)
-- ✅ **Freelancer.com integration** (OAuth - freelance gigs & projects)
+- ✅ **RemoteOK integration** (free - remote tech jobs)
+- ✅ **We Work Remotely** (free - quality remote jobs)
+- ✅ **Freelancer.com integration** (OAuth - freelance gigs)
+- ✅ **Adzuna integration** (free tier - global job aggregator)
 - ✅ AI-powered matching algorithm
 - ✅ CV-based automatic keyword extraction
 - ✅ Location-based filtering

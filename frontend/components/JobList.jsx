@@ -157,6 +157,10 @@ export default function JobList({ keywords = [], jobTitles = [], location = null
                       ? 'bg-green-100 text-green-700' 
                       : job.source === 'Freelancer.com'
                       ? 'bg-purple-100 text-purple-700'
+                      : job.source === 'Arbeitnow'
+                      ? 'bg-orange-100 text-orange-700'
+                      : job.source === 'Adzuna'
+                      ? 'bg-cyan-100 text-cyan-700'
                       : 'bg-blue-100 text-blue-700'
                   }`}>
                     {job.source}

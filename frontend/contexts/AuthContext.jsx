@@ -95,6 +95,25 @@ export const AuthProvider = ({ children }) => {
     }
   }, [privyAuth?.authenticated]);
 
+  // Helper function to extract error message from API response
+  const extractErrorMessage = (error) => {
+    const detail = error.response?.data?.detail;
+    if (!detail) return error.message || 'An error occurred';
+    
+    // Handle Pydantic validation errors (array of objects)
+    if (Array.isArray(detail)) {
+      return detail.map(err => err.msg || JSON.stringify(err)).join(', ');
+    }
+    
+    // Handle object with message property
+    if (typeof detail === 'object' && detail !== null) {
+      return detail.msg || detail.message || JSON.stringify(detail);
+    }
+    
+    // Handle string
+    return String(detail);
+  };
+
   const login = async (email, password) => {
     try {
       const response = await authAPI.login({ email, password });
@@ -118,7 +137,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.detail || 'Login failed' 
+        error: extractErrorMessage(error)
       };
     }
   };
@@ -178,7 +197,7 @@ export const AuthProvider = ({ children }) => {
       
       return { 
         success: false, 
-        error: errorMessage
+        error: extractErrorMessage(error)
       };
     }
   };

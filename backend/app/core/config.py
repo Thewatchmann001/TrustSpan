@@ -29,9 +29,14 @@ class Settings(BaseSettings):
     
     # Job Search APIs
     # RemoteOK: Free public API - no key needed!
+    # We Work Remotely: Free public API - no key needed!
     # Freelancer.com: OAuth token required
     FREELANCER_OAUTH_TOKEN: Optional[str] = None
     FREELANCER_SANDBOX: bool = False  # Set to True for testing
+    
+    # Adzuna: Free tier (250 req/day) - get keys at https://developer.adzuna.com/
+    ADZUNA_APP_ID: Optional[str] = None
+    ADZUNA_API_KEY: Optional[str] = None
     
     # App
     APP_NAME: str = "TrustBridge API"
