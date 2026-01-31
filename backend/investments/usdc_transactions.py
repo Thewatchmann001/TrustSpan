@@ -57,20 +57,26 @@ class USDCTransactions:
         if not startup:
             raise ValueError(f"Startup {startup_id} not found")
         
-        # Validate wallet address format
+        # Get founder's wallet address (needed for USDC transfer)
+        founder = db.query(User).filter(User.id == startup.founder_id).first()
+        if not founder or not founder.wallet_address:
+            raise ValueError("Startup founder must have a wallet address")
+        
+        founder_wallet_address = founder.wallet_address.strip()
+        
+        # Validate wallet address formats
         from app.utils.helpers import validate_solana_address
         wallet_address = investor.wallet_address.strip()
         
         if not validate_solana_address(wallet_address):
-            raise ValueError("Invalid Solana wallet address format")
+            raise ValueError("Invalid investor Solana wallet address format")
+        
+        if not validate_solana_address(founder_wallet_address):
+            raise ValueError("Invalid founder Solana wallet address format")
         
         # Ensure startup is registered on-chain
         if not startup.transaction_signature or startup.transaction_signature.startswith("mock_"):
             logger.info(f"Startup {startup_id} not registered on-chain, registering now...")
-            
-            founder = db.query(User).filter(User.id == startup.founder_id).first()
-            if not founder or not founder.wallet_address:
-                raise ValueError("Startup founder must have a wallet address")
             
             # Register startup on-chain
             from blockchain.startup_client import StartupClient
@@ -79,7 +85,7 @@ class USDCTransactions:
             blockchain_result = startup_client.register_startup(
                 startup_name=startup.name,
                 sector=startup.sector,
-                founder_address=founder.wallet_address
+                founder_address=founder_wallet_address
             )
             
             blockchain_startup_id = blockchain_result.get("startup_id")
@@ -89,9 +95,10 @@ class USDCTransactions:
             db.commit()
             db.refresh(startup)
         
-        # Record investment on blockchain
+        # Transfer USDC and record investment on blockchain
         blockchain_result = self.investment_client.invest_in_startup(
             investor_address=wallet_address,
+            founder_address=founder_wallet_address,  # NEW: Pass founder address for USDC transfer
             startup_id=startup.startup_id,
             amount_usdc=amount_usdc
         )

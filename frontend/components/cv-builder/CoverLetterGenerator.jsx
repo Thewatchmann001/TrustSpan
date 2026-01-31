@@ -22,7 +22,8 @@ export default function CoverLetterGenerator({ cvData }) {
 
     setLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.93:8000";
+      const apiUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.93:8000";
       const endpoint = apiUrl + "/api/cv/generate-cover-letter";
       const response = await fetch(endpoint, {
         method: "POST",
@@ -35,9 +36,18 @@ export default function CoverLetterGenerator({ cvData }) {
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
-        setCoverLetter(result.cover_letter);
+        // Strip any remaining markdown formatting
+        let cleanLetter = result.cover_letter || "";
+        cleanLetter = cleanLetter
+          .replace(/\*\*(.*?)\*\*/g, "$1") // Bold
+          .replace(/\*(.*?)\*/g, "$1") // Italic
+          .replace(/`(.*?)`/g, "$1") // Code
+          .replace(/#{1,6}\s+/g, "") // Headers
+          .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1") // Links
+          .trim();
+        setCoverLetter(cleanLetter);
         setEditing(false);
         toast.success("Cover letter generated successfully!");
       } else {
@@ -121,7 +131,9 @@ export default function CoverLetterGenerator({ cvData }) {
           className="space-y-4"
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">Your Cover Letter</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Your Cover Letter
+            </h3>
             <div className="flex gap-2">
               <button
                 onClick={() => setEditing(!editing)}

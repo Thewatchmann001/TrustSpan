@@ -4,23 +4,14 @@
  * Falls back to mock implementation if Privy is not configured
  */
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { usePrivy } from "@privy-io/react-auth";
+
+const PENDING_ROLE_STORAGE_KEY = "trustbridge_pending_role";
 
 const PRIVY_ENABLED = typeof window !== 'undefined' && 
   process.env.NEXT_PUBLIC_PRIVY_APP_ID && 
   process.env.NEXT_PUBLIC_PRIVY_APP_ID !== 'your-privy-app-id' &&
   process.env.NEXT_PUBLIC_PRIVY_APP_ID.trim() !== '';
-
-// Import usePrivy hook - must be imported at module level for React hooks to work
-let usePrivy = null;
-if (PRIVY_ENABLED) {
-  try {
-    const privyModule = require('@privy-io/react-auth');
-    usePrivy = privyModule.usePrivy;
-  } catch (e) {
-    console.warn('Privy not available, using fallback authentication:', e);
-  }
-}
 
 const PrivyAuthContext = createContext();
 
@@ -50,40 +41,24 @@ export const PrivyAuthProvider = ({ children }) => {
     getAccessToken: () => Promise.resolve(null),
   };
 
-  // Try to use Privy hook if available, otherwise use fallback
-  // IMPORTANT: usePrivy() must be called inside a component that's wrapped by PrivyProvider
-  // We check if we're inside PrivyProvider by trying to use the hook
+  // IMPORTANT: usePrivy() must be called inside a component that's wrapped by PrivyProvider.
+  // We'll catch the missing-provider error and fall back.
   let privyHook;
   let hookError = null;
   
-  // Always try to use Privy hook if it's available (even if PRIVY_ENABLED check fails)
-  // This allows the hook to work when PrivyProvider is present
-  if (usePrivy) {
-    try {
-      privyHook = usePrivy();
-      // Debug logging
-      if (typeof window !== 'undefined') {
-        console.log('✅ Privy hook initialized successfully, ready:', privyHook?.ready);
-        console.log('Privy hook has login function:', typeof privyHook?.login === 'function');
-      }
-    } catch (error) {
-      hookError = error;
-      // If error is about missing PrivyProvider, use fallback
-      if (error.message?.includes('PrivyProvider') || error.message?.includes('wrap your application')) {
-        console.error('❌ PrivyProvider not found when calling usePrivy():', error.message);
-        console.error('This means PrivyAuthProvider is not inside PrivyProvider. Check _app.jsx structure.');
-        privyHook = fallbackAuth;
-      } else {
-        console.error('❌ Error initializing Privy hook:', error);
-        privyHook = fallbackAuth;
-      }
+  try {
+    privyHook = usePrivy();
+  } catch (error) {
+    hookError = error;
+    // If error is about missing PrivyProvider, use fallback
+    if (error.message?.includes('PrivyProvider') || error.message?.includes('wrap your application')) {
+      console.error('❌ PrivyProvider not found when calling usePrivy():', error.message);
+      console.error('This means PrivyAuthProvider is not inside PrivyProvider. Check _app.jsx structure.');
+      privyHook = fallbackAuth;
+    } else {
+      console.error('❌ Error initializing Privy hook:', error);
+      privyHook = fallbackAuth;
     }
-  } else {
-    // usePrivy hook not available at all
-    if (PRIVY_ENABLED) {
-      console.warn('⚠️ Privy enabled but usePrivy hook not available - is @privy-io/react-auth installed?');
-    }
-    privyHook = fallbackAuth;
   }
   
   // Use ref to maintain privyHook reference and preserve context
@@ -101,40 +76,19 @@ export const PrivyAuthProvider = ({ children }) => {
   const linkWallet = privyHook?.linkWallet ?? fallbackAuth.linkWallet;
   const getAccessToken = privyHook?.getAccessToken ?? fallbackAuth.getAccessToken;
 
-  // Debug: Log ready state changes and check Privy initialization
+  // Debug: Log ready state changes (only once, not repeatedly)
   useEffect(() => {
     if (typeof window !== 'undefined' && PRIVY_ENABLED && privyHook && privyHook !== fallbackAuth) {
-      console.log('Privy ready state:', ready, 'PRIVY_ENABLED:', PRIVY_ENABLED, 'usePrivy available:', !!usePrivy);
-      
-      // Check if Privy scripts are loaded
-      if (!ready) {
-        console.log('Waiting for Privy to become ready...');
-        const checkPrivy = setInterval(() => {
-          // Re-check ready state from the hook
-          if (privyHook?.ready) {
-            console.log('✅ Privy is now ready!');
-            clearInterval(checkPrivy);
-          } else {
-            console.log('⏳ Still waiting for Privy...');
-          }
-        }, 2000);
-        
-        // Clear after 30 seconds
-        setTimeout(() => {
-          clearInterval(checkPrivy);
-          if (!privyHook?.ready) {
-            console.warn('⚠️ Privy did not become ready after 30 seconds. This might indicate a configuration issue.');
-          }
-        }, 30000);
-        
-        return () => clearInterval(checkPrivy);
-      } else {
-        console.log('✅ Privy is ready!');
+      // Only log when ready state actually changes, not on every render
+      if (ready) {
+        // Privy is ready - no need to poll or warn
+        return;
       }
+      // If not ready, Privy is still initializing - this is normal and will resolve automatically
+      // Don't poll or show warnings - Privy will become ready on its own
     }
   }, [ready, PRIVY_ENABLED, privyHook]);
 
-  const [solanaWallet, setSolanaWallet] = useState(null);
   const [solanaAddress, setSolanaAddress] = useState(null);
   const [userRole, setUserRole] = useState(null);
 
@@ -142,27 +96,29 @@ export const PrivyAuthProvider = ({ children }) => {
   useEffect(() => {
     if (authenticated && user) {
       // Privy automatically creates wallets for users
-      // Get Solana wallet from Privy user
-      const wallets = user?.linkedAccounts?.filter(
-        (account) => account.type === 'wallet' && account.walletClientType === 'solana'
-      );
-      
-      if (wallets && wallets.length > 0) {
-        const solanaWallet = wallets[0];
-        setSolanaWallet(solanaWallet);
-        setSolanaAddress(solanaWallet.address);
-      } else {
-        // If no Solana wallet exists, create one via Privy
-        // Privy will handle wallet creation on first use
-        setSolanaAddress(null);
-      }
+      // Find a Solana wallet address from linkedAccounts (robust across Privy versions)
+      const wallets = user?.linkedAccounts?.filter((account) => account.type === "wallet") || [];
+      const solWallet =
+        wallets.find((w) => w.chainType === "solana") ||
+        wallets.find((w) => String(w.walletClientType || "").toLowerCase().includes("solana")) ||
+        wallets[0];
 
-      // Get user role from Privy metadata or backend
-      // For now, default to investor if not set
-      const role = user?.metadata?.role || 'investor';
+      setSolanaAddress(solWallet?.address || null);
+
+      // Get user role from Privy metadata or from a pre-login selection stored in localStorage.
+      // This lets the user choose "investor/startup/job seeker" before Privy login,
+      // while keeping backend role assignment consistent in `/api/users/privy/sync`.
+      let role = user?.metadata?.role;
+      if (!role && typeof window !== "undefined") {
+        role = window.localStorage.getItem(PENDING_ROLE_STORAGE_KEY) || null;
+        if (role) {
+          console.log('📌 PrivyAuthContext: Found pending role in localStorage:', role);
+        }
+      }
+      role = role || 'investor';
+      console.log('👤 PrivyAuthContext: Setting userRole to:', role);
       setUserRole(role);
     } else {
-      setSolanaWallet(null);
       setSolanaAddress(null);
       setUserRole(null);
     }
@@ -312,7 +268,6 @@ export const PrivyAuthProvider = ({ children }) => {
     login: wrappedLogin,
     logout,
     linkEmail,
-    solanaWallet,
     solanaAddress,
     userRole,
     ensureSolanaWallet,

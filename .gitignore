@@ -1,14 +1,97 @@
 # TrustBridge Root .gitignore
 
-# Pitch Deck (Confidential)
-PITCH_DECK.md
-
-# Environment variables
+# ============================================
+# ENVIRONMENT VARIABLES & SECRETS
+# ============================================
 .env
+.env.*
 .env.local
-.env.*.local
+.envs
+.envs/*
+!.env.example
+*.env
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+credentials/
 
-# OS files
+# ============================================
+# PYTHON
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ============================================
+# VIRTUAL ENVIRONMENTS
+# ============================================
+venv/
+env/
+ENV/
+.venv
+venv.bak/
+env.bak/
+
+# ============================================
+# NODE.JS / FRONTEND
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+.npm
+.eslintcache
+.node_repl_history
+*.tgz
+.yarn-integrity
+.next/
+out/
+build/
+dist/
+
+# ============================================
+# IDE & EDITOR FILES
+# ============================================
+.vscode/
+.idea/
+.cursor/
+.codacy/
+.amazonq/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+.vscode-test/
+
+# ============================================
+# OS FILES
+# ============================================
 .DS_Store
 .DS_Store?
 ._*
@@ -16,31 +99,90 @@ PITCH_DECK.md
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.project
-.classpath
-.settings/
+# ============================================
+# DATABASE
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
 
-# Logs
+# ============================================
+# LOGS
+# ============================================
 *.log
 logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
-# Temporary files
+# ============================================
+# TESTING
+# ============================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+coverage.xml
+*.cover
+.hypothesis/
+
+# ============================================
+# TEMPORARY FILES
+# ============================================
 *.tmp
 *.temp
 .cache/
+*.bak
+*.swp
+*.swo
+*~
 
+# ============================================
+# UPLOADED FILES & STATIC CONTENT
+# ============================================
+static/uploads/*
+!static/uploads/.gitkeep
+*.pdf
+*.docx
+*.doc
+uploads/
+media/
 
+# ============================================
+# BLOCKCHAIN / SOLANA
+# ============================================
+target/
+Cargo.lock
+*.wasm
+.idl/
+deploy-keypair.json
+test-keypair.json
 
-#Ignore cursor AI rules
-.cursor/rules/codacy.mdc
+# ============================================
+# DOCUMENTATION (OPTIONAL - REMOVE IF NEEDED)
+# ============================================
+# Uncomment if you want to keep pitch deck private
+# PITCH_DECK.md
 
+# ============================================
+# CURSOR AI RULES (PRIVATE)
+# ============================================
+.cursor/rules/
+.github/instructions/
 
-#Ignore vscode AI rules
-.github/instructions/codacy.instructions.md
+# ============================================
+# MISC
+# ============================================
+.vercel
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl

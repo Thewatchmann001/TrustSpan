@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Building2, MapPin, Users, TrendingUp, Award, X } from "lucide-react";
+import { Building2, MapPin, Users, TrendingUp, Award, X, ExternalLink, Shield } from "lucide-react";
 import { startupAPI } from "../lib/api";
 import toast from "react-hot-toast";
+import { AttestationBadgeList } from "./attestation/AttestationBadge";
 
 const StartupCard = ({ startup }) => {
   const [showEmployees, setShowEmployees] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
+  const [attestations, setAttestations] = useState([]);
+  const [loadingAttestations, setLoadingAttestations] = useState(false);
 
   const credibilityGrade =
     startup.credibility_score >= 80
@@ -36,6 +39,32 @@ const StartupCard = ({ startup }) => {
       toast.error("Failed to load employees");
     } finally {
       setLoadingEmployees(false);
+    }
+  };
+
+  // Fetch attestations if founder_id is available
+  useEffect(() => {
+    const founderId = startup.founder_id || startup.founder?.id;
+    if (founderId) {
+      fetchAttestations(founderId);
+    }
+  }, [startup.founder_id, startup.founder?.id]);
+
+  const fetchAttestations = async (founderId) => {
+    try {
+      setLoadingAttestations(true);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/attestations/user/${founderId}`);
+      if (response.ok) {
+        const data = await response.json();
+        // Only show verified attestations
+        const verified = (data.attestations || []).filter(att => att.verified);
+        setAttestations(verified.slice(0, 2)); // Show max 2 badges on card
+      }
+    } catch (error) {
+      console.error("Error fetching attestations:", error);
+    } finally {
+      setLoadingAttestations(false);
     }
   };
 
@@ -93,16 +122,39 @@ const StartupCard = ({ startup }) => {
             )}
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-            <div className="flex items-center gap-2">
-              <Award className="w-4 h-4 text-green-600" />
-              <span className="text-sm font-semibold text-green-700">
-                Blockchain Verified
+          <div className="pt-4 border-t border-gray-200 space-y-2">
+            {/* Attestation Badges */}
+            {attestations.length > 0 && (
+              <div className="mb-2">
+                <AttestationBadgeList attestations={attestations} size="sm" />
+              </div>
+            )}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-bold text-green-700">
+                  Blockchain Verified
+                </span>
+              </div>
+              <span className="text-sm text-trust-blue font-semibold group-hover:underline">
+                View Details →
               </span>
             </div>
-            <span className="text-sm text-trust-blue font-semibold group-hover:underline">
-              View Details →
-            </span>
+            {startup.transaction_signature && (
+              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs font-bold text-green-900 mb-1">Transaction Hash:</p>
+                <a
+                  href={`https://explorer.solana.com/tx/${startup.transaction_signature}?cluster=devnet`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-xs text-green-700 hover:text-green-900 font-mono break-all flex items-center gap-1 hover:underline"
+                >
+                  {startup.transaction_signature.substring(0, 16)}...
+                  <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </Link>

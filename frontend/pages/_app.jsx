@@ -1,12 +1,24 @@
 import "../styles/globals.css";
 import { AuthProvider } from "../contexts/AuthContext";
+import { JobsProvider } from "../contexts/JobsContext";
 import { Toaster } from "react-hot-toast";
 import Layout from "../components/Layout";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import PrivyWrapper from "../components/PrivyWrapper";
+import { PrivyAuthProvider } from "../contexts/PrivyAuthContext";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
+import "@solana/wallet-adapter-react-ui/styles.css";
 
-// Privy is disabled - using only local AuthContext
-const PRIVY_ENABLED = false;
+const PRIVY_APP_ID = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
+const PRIVY_ENABLED =
+  typeof PRIVY_APP_ID === "string" &&
+  PRIVY_APP_ID.trim() !== "" &&
+  PRIVY_APP_ID !== "your-privy-app-id";
 
 function MyApp({ Component, pageProps }) {
   // Fix hydration by only rendering on client
@@ -69,33 +81,34 @@ function MyApp({ Component, pageProps }) {
       });
     }
 
-    // Debug: Log Privy configuration on mount
-    if (typeof window !== "undefined") {
-      console.log("🔍 Privy Configuration Check:");
-      console.log("  PRIVY_ENABLED:", PRIVY_ENABLED);
-      console.log(
-        "  PRIVY_APP_ID:",
-        PRIVY_APP_ID ? `${PRIVY_APP_ID.substring(0, 10)}...` : "NOT SET"
-      );
-      console.log("  Environment:", process.env.NODE_ENV);
-      console.log("  Using PrivyWrapper component");
-
-      // Check if Privy scripts are being loaded
-      const checkPrivyScripts = setInterval(() => {
-        const scripts = Array.from(
-          document.querySelectorAll(
-            'script[src*="privy"], script[src*="auth.privy.io"]'
-          )
-        );
-        if (scripts.length > 0) {
-          console.log("✅ Found Privy scripts in DOM:", scripts.length);
-          clearInterval(checkPrivyScripts);
-        }
-      }, 1000);
-
-      setTimeout(() => clearInterval(checkPrivyScripts), 10000);
-    }
   }, []);
+
+  // Debug: Log Privy configuration (dev-safe)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    console.log("🔍 Privy Configuration Check:");
+    console.log("  PRIVY_ENABLED:", PRIVY_ENABLED);
+    console.log(
+      "  PRIVY_APP_ID:",
+      PRIVY_APP_ID ? `${PRIVY_APP_ID.substring(0, 10)}...` : "NOT SET"
+    );
+  }, []);
+
+  // Wallet Adapter setup (for transaction signing - Option 1: Use Wallet Adapter)
+  // Privy is only used for authentication, Wallet Adapter handles signing
+  // IMPORTANT: All hooks must be called before any conditional returns
+  const network = WalletAdapterNetwork.Devnet;
+  const endpoint = useMemo(() => {
+    return process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.devnet.solana.com";
+  }, []);
+  
+  const wallets = useMemo(
+    () => [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+    ],
+    []
+  );
 
   // Show loading while client mounts (prevents hydration mismatch)
   if (!mounted) {
@@ -110,12 +123,26 @@ function MyApp({ Component, pageProps }) {
   }
 
   const coreApp = (
-    <AuthProvider>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-      <Toaster position="top-right" />
-    </AuthProvider>
+    <ErrorBoundary>
+      <PrivyWrapper>
+        <PrivyAuthProvider>
+          <ConnectionProvider endpoint={endpoint}>
+            <WalletProvider wallets={wallets} autoConnect>
+              <WalletModalProvider>
+                <AuthProvider>
+                  <JobsProvider>
+                    <Layout>
+                      <Component {...pageProps} />
+                    </Layout>
+                    <Toaster position="top-right" />
+                  </JobsProvider>
+                </AuthProvider>
+              </WalletModalProvider>
+            </WalletProvider>
+          </ConnectionProvider>
+        </PrivyAuthProvider>
+      </PrivyWrapper>
+    </ErrorBoundary>
   );
 
   return (

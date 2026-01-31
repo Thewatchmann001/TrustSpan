@@ -6,6 +6,28 @@ import json
 import re
 
 
+def validate_solana_address(address: str) -> bool:
+    """
+    Validate a Solana wallet address format.
+    
+    Args:
+        address: Solana wallet address string
+        
+    Returns:
+        True if address is valid, False otherwise
+    """
+    if not address or not isinstance(address, str):
+        return False
+    
+    addr = address.strip()
+    # Basic Solana address validation: 32-44 characters, base58 encoded
+    if len(addr) < 32 or len(addr) > 44:
+        return False
+    # Base58 characters (no 0, O, I, l)
+    base58_regex = re.compile(r'^[1-9A-HJ-NP-Za-km-z]+$')
+    return bool(base58_regex.match(addr))
+
+
 def calculate_match_score(
     skills_match: float,
     location_match: float,

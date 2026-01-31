@@ -88,6 +88,7 @@ class StartupVerification:
             result.append({
                 "id": startup.id,
                 "startup_id": startup.startup_id,
+                "founder_id": startup.founder_id,  # Include founder_id for attestation fetching
                 "name": startup.name,
                 "sector": startup.sector,
                 "country": startup.country,
@@ -127,6 +128,7 @@ class StartupVerification:
         return {
             "id": startup.id,
             "startup_id": startup.startup_id,
+            "founder_id": startup.founder_id,  # Include founder_id for attestation fetching
             "name": startup.name,
             "sector": startup.sector,
             "country": startup.country,
@@ -139,7 +141,8 @@ class StartupVerification:
             "founder": {
                 "id": founder.id if founder else None,
                 "name": founder.full_name if founder else None,
-                "email": founder.email if founder else None
+                "email": founder.email if founder else None,
+                "wallet_address": founder.wallet_address if founder else None
             },
             "website": startup.website,
             "contact_email": startup.contact_email,

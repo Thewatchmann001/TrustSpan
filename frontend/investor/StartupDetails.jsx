@@ -16,12 +16,15 @@ import {
   DollarSign,
   Briefcase,
   Target,
+  Wallet,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import { useAuth } from "../contexts/AuthContext";
 import Chat from "../components/Chat";
 import CredibilityBreakdown from "./CredibilityBreakdown";
+import { AttestationBadgeList } from "../components/attestation/AttestationBadge";
+import AttestationStatus from "../components/attestation/AttestationStatus";
 
 export default function StartupDetails({ startupId }) {
   const router = useRouter();
@@ -30,6 +33,7 @@ export default function StartupDetails({ startupId }) {
   const [loading, setLoading] = useState(true);
   const [qrCode, setQrCode] = useState(null);
   const [showChat, setShowChat] = useState(false);
+  const [founderId, setFounderId] = useState(null);
 
   useEffect(() => {
     if (startupId) {
@@ -60,6 +64,12 @@ export default function StartupDetails({ startupId }) {
 
       const data = await response.json();
       setStartup(data);
+      // Extract founder_id for attestation fetching
+      if (data.founder?.id) {
+        setFounderId(data.founder.id);
+      } else if (data.founder_id) {
+        setFounderId(data.founder_id);
+      }
     } catch (error) {
       console.error("Error fetching startup:", error);
       toast.error(error.message || "Failed to fetch startup details");
@@ -121,6 +131,17 @@ export default function StartupDetails({ startupId }) {
           </div>
         </div>
       </div>
+
+      {/* Attestation Badges */}
+      {founderId && (
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <Shield className="w-5 h-5 text-indigo-600" />
+            Verification Badges
+          </h2>
+          <AttestationStatus userId={founderId} />
+        </div>
+      )}
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -318,6 +339,37 @@ export default function StartupDetails({ startupId }) {
               <p className="text-xs text-green-700 mt-3 font-mono break-all">
                 {startup.transaction_signature}
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Funding Wallet Address */}
+      {startup.founder && startup.founder.wallet_address && (
+        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mt-4">
+          <div className="flex items-start gap-4">
+            <Wallet className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-blue-900 mb-2">
+                Funding Wallet Address
+              </h3>
+              <p className="text-sm text-blue-800 mb-3">
+                USDC investments are sent to this address (Devnet - test tokens only):
+              </p>
+              <div className="bg-white p-3 rounded border border-blue-200 mb-3">
+                <p className="text-xs text-blue-900 font-mono break-all">
+                  {startup.founder.wallet_address}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(startup.founder.wallet_address);
+                  toast.success("Wallet address copied to clipboard!");
+                }}
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium text-sm"
+              >
+                Copy Address
+              </button>
             </div>
           </div>
         </div>

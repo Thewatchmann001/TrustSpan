@@ -89,13 +89,13 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
             max="50"
             value={formData.founder_experience_years}
             onChange={(e) => setFormData({ ...formData, founder_experience_years: parseInt(e.target.value) || 0 })}
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50"
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 font-medium"
             placeholder="Years of experience"
           />
           <button
             onClick={() => handleUpdate({ founder_experience_years: formData.founder_experience_years })}
             disabled={loading}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+            className="w-full px-4 py-2 bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-sky-700 hover:to-indigo-700 disabled:opacity-50 transition-all"
           >
             Save
           </button>
@@ -114,10 +114,10 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
             type="url"
             value={formData.mvp_url || ""}
             onChange={(e) => setFormData({ ...formData, mvp_url: e.target.value })}
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50"
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 font-medium"
             placeholder="https://your-mvp.com or https://demo-link.com"
           />
-          <p className="text-xs text-white/60">Provide a working link to your MVP or product demo</p>
+          <p className="text-xs text-slate-600 font-medium">Provide a working link to your MVP or product demo</p>
           <button
             onClick={() => {
               if (!formData.mvp_url || !formData.mvp_url.trim()) {
@@ -130,7 +130,7 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
               });
             }}
             disabled={loading || !formData.mvp_url?.trim()}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2 bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-sky-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {loading ? "Saving..." : "Verify MVP"}
           </button>
@@ -150,13 +150,13 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
             min="0"
             value={formData.user_base_count}
             onChange={(e) => setFormData({ ...formData, user_base_count: parseInt(e.target.value) || 0 })}
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50"
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 font-medium"
             placeholder="Number of active users"
           />
           <button
             onClick={() => handleUpdate({ user_base_count: formData.user_base_count })}
             disabled={loading}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+            className="w-full px-4 py-2 bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-sky-700 hover:to-indigo-700 disabled:opacity-50 transition-all"
           >
             Save
           </button>
@@ -177,13 +177,13 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
             step="0.01"
             value={formData.monthly_revenue}
             onChange={(e) => setFormData({ ...formData, monthly_revenue: parseFloat(e.target.value) || 0 })}
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50"
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 font-medium"
             placeholder="Monthly revenue in USDC"
           />
           <button
             onClick={() => handleUpdate({ monthly_revenue: formData.monthly_revenue })}
             disabled={loading}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+            className="w-full px-4 py-2 bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-sky-700 hover:to-indigo-700 disabled:opacity-50 transition-all"
           >
             Save
           </button>
@@ -212,7 +212,7 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
             type="email"
             value={formData.contact_email}
             onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50"
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 font-medium"
             placeholder="Contact email"
             onBlur={() => formData.contact_email && handleUpdate({ contact_email: formData.contact_email })}
           />
@@ -220,14 +220,14 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
             type="url"
             value={formData.website}
             onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50"
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 font-medium"
             placeholder="Website URL"
             onBlur={() => formData.website && handleUpdate({ website: formData.website })}
           />
           <textarea
             value={formData.address}
             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50"
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 font-medium"
             placeholder="Business address"
             rows="2"
             onBlur={() => formData.address && handleUpdate({ address: formData.address })}
@@ -247,10 +247,10 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
             type="url"
             value={formData.registration_doc_url || ""}
             onChange={(e) => setFormData({ ...formData, registration_doc_url: e.target.value })}
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50"
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 font-medium"
             placeholder="https://link-to-registration-documents.com or Google Drive/Dropbox link"
           />
-          <p className="text-xs text-white/60">Provide a link to your business registration documents (PDF, Google Drive, etc.)</p>
+          <p className="text-xs text-slate-600 font-medium">Provide a link to your business registration documents (PDF, Google Drive, etc.)</p>
           <button
             onClick={() => {
               if (!formData.registration_doc_url || !formData.registration_doc_url.trim()) {
@@ -263,7 +263,7 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
               });
             }}
             disabled={loading || !formData.registration_doc_url?.trim()}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2 bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-sky-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {loading ? "Verifying..." : "Verify Business Registration"}
           </button>
@@ -282,10 +282,10 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
             type="url"
             value={formData.founder_profile_url || ""}
             onChange={(e) => setFormData({ ...formData, founder_profile_url: e.target.value })}
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50"
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 font-medium"
             placeholder="https://linkedin.com/in/yourprofile or professional profile link"
           />
-          <p className="text-xs text-white/60">Provide a link to your verified LinkedIn or professional profile</p>
+          <p className="text-xs text-slate-600 font-medium">Provide a link to your verified LinkedIn or professional profile</p>
           <button
             onClick={() => {
               if (!formData.founder_profile_url || !formData.founder_profile_url.trim()) {
@@ -295,7 +295,7 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
               handleUpdate({ founder_profile_verified: true });
             }}
             disabled={loading || !formData.founder_profile_url?.trim()}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2 bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-sky-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {loading ? "Verifying..." : "Verify Founder Profile"}
           </button>
@@ -306,12 +306,12 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
 
   if (improvementItems.length === 0) {
     return (
-      <div className="backdrop-blur-xl bg-green-50/10 border border-green-200 rounded-lg p-6">
+      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
         <div className="flex items-center gap-3">
-          <CheckCircle className="w-8 h-8 text-green-400" />
+          <CheckCircle className="w-8 h-8 text-emerald-600" />
           <div>
-            <h3 className="text-xl font-bold text-white">All Good! 🎉</h3>
-            <p className="text-white/80">Your startup profile is complete and credible!</p>
+            <h3 className="text-xl font-bold text-slate-900">All Good! 🎉</h3>
+            <p className="text-slate-700">Your startup profile is complete and credible!</p>
           </div>
         </div>
       </div>
@@ -320,15 +320,15 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
 
   return (
     <div className="space-y-4">
-      <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg p-6">
-        <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-          <TrendingUp className="w-6 h-6 text-blue-400" />
+      <div className="card bg-gradient-to-r from-sky-50 to-amber-50 border border-sky-200 rounded-lg p-6">
+        <h3 className="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+          <TrendingUp className="w-6 h-6 text-sky-600" />
           Improve Your Credibility Score
         </h3>
-        <p className="text-white/80 text-sm mb-4">
-          Current Score: <span className="font-bold text-white">{startup?.credibility_score?.toFixed(1) || 0}%</span>
+        <p className="text-slate-700 text-sm mb-4 font-semibold">
+          Current Score: <span className="font-bold text-slate-900 text-lg">{startup?.credibility_score?.toFixed(1) || 0}%</span>
         </p>
-        <p className="text-white/60 text-xs">
+        <p className="text-slate-600 text-sm">
           Complete the following items to boost your credibility and attract more investors:
         </p>
       </div>
@@ -338,19 +338,26 @@ export default function CredibilityImprovement({ startup, onUpdate }) {
         return (
           <div
             key={item.id}
-            className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg p-6"
+            className="card bg-white border-2 border-slate-300 rounded-lg p-6 shadow-md"
           >
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-red-500/20 rounded-lg">
-                <AlertCircle className="w-6 h-6 text-red-400" />
+              <div className="p-3 bg-red-100 rounded-lg flex-shrink-0">
+                <AlertCircle className="w-6 h-6 text-red-600" />
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <Icon className="w-5 h-5 text-white/80" />
-                  <h4 className="text-lg font-semibold text-white">{item.title}</h4>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2">
+                  <Icon className="w-5 h-5 text-slate-900 flex-shrink-0" />
+                  <h4 className="text-lg font-bold text-slate-900 leading-tight">{item.title}</h4>
                 </div>
-                <p className="text-white/70 text-sm mb-4">{item.description}</p>
-                {item.action}
+                <p className="text-slate-700 text-sm mb-4 font-semibold leading-relaxed">{item.description}</p>
+                {item.id === "team_verification" && (
+                  <h5 className="text-base font-bold text-gray-900 mb-3 mt-4" style={{ color: '#000', fontWeight: 700 }}>
+                    Team Members
+                  </h5>
+                )}
+                <div className="mt-4">
+                  {item.action}
+                </div>
               </div>
             </div>
           </div>

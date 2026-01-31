@@ -1,10 +1,13 @@
 """
 ATS Optimizer Module
 Optimizes CVs for Applicant Tracking Systems with keyword matching and formatting.
+
+NOTE: Uses ATSEngine for deterministic, consistent scoring across all endpoints.
 """
 from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 from app.services.ai_service import AIService
+from cv.ats_engine import ATSEngine
 from app.utils.logger import logger
 
 
@@ -13,33 +16,46 @@ class ATSOptimizer:
     
     def __init__(self):
         self.ai_service = AIService()
+        self.ats_engine = ATSEngine()  # Use deterministic engine for consistent scoring
     
     def calculate_ats_score(self, cv_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Calculate ATS compatibility score with detailed feedback.
         
+        Uses ATSEngine for deterministic, consistent scoring.
+        
         Returns:
             {
                 "score": float (0-100),
+                "grade": str (A+, A, B, C, D),
                 "keyword_density": float,
                 "section_completeness": dict,
                 "formatting_score": float,
-                "recommendations": List[str]
+                "recommendations": List[str],
+                "ats_score": float (same as score, for compatibility)
             }
         """
-        logger.info("Calculating ATS score")
+        logger.info("Calculating ATS score using ATSEngine (deterministic)")
         
-        # Optimize CV for ATS
-        optimized_cv = self.ai_service.optimize_for_ats(cv_data)
+        # Use ATSEngine for deterministic scoring (same as job search and other endpoints)
+        ats_result = self.ats_engine.calculate_ats_score(cv_data)
         
-        ats_data = optimized_cv.get("ats_optimized", {})
+        score = ats_result.get("ats_score", 0)
+        grade = ats_result.get("ats_grade", "D")
+        component_scores = ats_result.get("component_scores", {})
         
         return {
-            "score": ats_data.get("formatting_score", 0),
-            "keyword_density": ats_data.get("keyword_density", 0),
-            "section_completeness": ats_data.get("section_completeness", {}),
-            "formatting_score": ats_data.get("formatting_score", 0),
-            "recommendations": ats_data.get("recommendations", [])
+            "ats_score": score,
+            "score": score,  # For compatibility
+            "grade": grade,
+            "keyword_density": ats_result.get("keyword_density", 0),
+            "section_completeness": component_scores.get("section_completeness", {}),
+            "formatting_score": component_scores.get("formatting_readability", 0) * 6.67,  # Scale 0-15 to 0-100
+            "recommendations": ats_result.get("ats_recommendations", []),
+            "issues": ats_result.get("ats_issues", []),
+            "fixes": ats_result.get("ats_recommendations", []),
+            "component_scores": component_scores,
+            "component_feedback": ats_result.get("component_feedback", {})
         }
     
     def optimize_for_job(self, cv_data: Dict[str, Any], job_description: str, job_skills: List[str], job_title: str) -> Dict[str, Any]:

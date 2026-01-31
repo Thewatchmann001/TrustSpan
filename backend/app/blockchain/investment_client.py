@@ -1,5 +1,6 @@
 import subprocess
 import json
+import os
 from typing import Dict, Any, List
 from pathlib import Path
 from app.core.config import settings
@@ -20,11 +21,18 @@ class InvestmentClient:
     def invest_in_startup(
         self,
         investor_address: str,
+        founder_address: str,  # NEW parameter for USDC transfer destination
         startup_id: str,
         amount_usdc: float
     ) -> Dict[str, Any]:
         """
-        Record an investment in a startup on-chain.
+        Transfer USDC and record an investment in a startup on-chain.
+        
+        Args:
+            investor_address: Investor's wallet address (sends USDC)
+            founder_address: Founder's wallet address (receives USDC)
+            startup_id: Startup ID (on-chain)
+            amount_usdc: Amount in USDC
         
         Returns:
             {
@@ -36,25 +44,32 @@ class InvestmentClient:
             }
         """
         try:
-            logger.info(f"Recording investment: {amount_usdc} USDC in startup {startup_id}")
+            logger.info(f"Transferring {amount_usdc} USDC from {investor_address} to {founder_address} for startup {startup_id}")
             
             # Call Node.js script
             # Use absolute path and set working directory to script's parent
             script_path = str(self.invest_script.resolve())
             script_dir = str(self.invest_script.parent.resolve())
             
+            # Pass environment variables (including DEVNET_USDC_MINT)
+            env = os.environ.copy()
+            if hasattr(settings, 'DEVNET_USDC_MINT') and settings.DEVNET_USDC_MINT:
+                env['DEVNET_USDC_MINT'] = settings.DEVNET_USDC_MINT
+            
             result = subprocess.run(
                 [
                     "node",
                     script_path,
                     investor_address,
+                    founder_address,  # NEW: Pass founder address
                     startup_id,
                     str(amount_usdc)
                 ],
                 capture_output=True,
                 text=True,
                 timeout=60,
-                cwd=script_dir
+                cwd=script_dir,
+                env=env  # Pass environment variables
             )
             
             if result.returncode != 0:

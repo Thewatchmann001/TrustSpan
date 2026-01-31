@@ -22,10 +22,15 @@ const usePrivyAuthSafe = () => {
   }
 };
 
+const PENDING_ROLE_STORAGE_KEY = "trustbridge_pending_role";
+const ROLE_MISMATCH_MESSAGE_KEY = "trustbridge_role_mismatch_message";
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [syncFailed, setSyncFailed] = useState(false); // Guard to prevent infinite retries
+  const [authError, setAuthError] = useState(null); // Store backend error messages for UI display
   const router = useRouter();
 
   // Get Privy auth state (safely)
@@ -34,13 +39,35 @@ export const AuthProvider = ({ children }) => {
   // Sync Privy user with backend
   useEffect(() => {
     const syncPrivyUser = async () => {
+      // GUARD 1: Don't retry if sync already failed (e.g., 403 role mismatch) - FATAL ERROR
+      if (syncFailed) {
+        console.log('⏸️ Sync previously failed (fatal error), skipping retry');
+        setLoading(false);
+        return;
+      }
+
+      // GUARD 2: Don't sync if there's an auth error
+      if (authError) {
+        console.log('⏸️ Auth error exists, skipping sync');
+        setLoading(false);
+        return;
+      }
+
+      // GUARD 3: Don't sync if user already exists (already synced)
+      if (user) {
+        setLoading(false);
+        return;
+      }
+
       if (privyAuth && privyAuth.authenticated && privyAuth.user && !user) {
         try {
+          console.log('🔄 Starting Privy user sync...');
           // Get Privy user data
           const privyUser = privyAuth.user;
           const email = privyUser.email?.address || privyUser.linkedAccounts?.find(acc => acc.type === 'email')?.address;
           
           if (!email) {
+            console.warn('⚠️ No email found in Privy user, cannot sync');
             setLoading(false);
             return;
           }
@@ -49,36 +76,186 @@ export const AuthProvider = ({ children }) => {
           const solanaWallet = privyAuth.solanaAddress || 
             privyUser.linkedAccounts?.find(acc => acc.type === 'wallet' && acc.walletClientType === 'solana');
 
+          // Get role from localStorage (set before Privy login) or default
+          // Note: Backend will enforce role matching - existing user's role is authoritative
+          let role = 'investor'; // Default
+          if (typeof window !== 'undefined') {
+            const pendingRole = localStorage.getItem(PENDING_ROLE_STORAGE_KEY);
+            if (pendingRole) {
+              role = pendingRole;
+              console.log('📌 Using pending role from localStorage:', role);
+            }
+          }
+          // Fallback to privyAuth.userRole if available
+          if (!role && privyAuth.userRole) {
+            role = privyAuth.userRole;
+          }
+
           // Sync with backend
           const syncData = {
             privy_id: privyUser.id,
             email: email,
             full_name: privyUser.name || email.split('@')[0],
             wallet_address: solanaWallet?.address || solanaWallet || null,
-            role: privyAuth.userRole || 'investor', // Default to investor
+            role: role,
           };
 
+          console.log('📤 Syncing with backend:', { email, role, wallet: syncData.wallet_address });
           const response = await authAPI.syncPrivy(syncData);
           const backendUser = response.data;
 
+          console.log('✅ Backend sync successful:', { 
+            id: backendUser.id, 
+            role: backendUser.role,
+            hasToken: !!backendUser.access_token 
+          });
+
           // Store token and user
           if (backendUser.access_token) {
-    if (typeof window !== 'undefined') {
+            if (typeof window !== 'undefined') {
               localStorage.setItem('token', backendUser.access_token);
               localStorage.setItem('user', JSON.stringify(backendUser));
+              // Clear role selection once synced
+              localStorage.removeItem(PENDING_ROLE_STORAGE_KEY);
             }
             setToken(backendUser.access_token);
             setUser(backendUser);
+            console.log('✅ Token and user stored, should trigger redirect');
+          } else {
+            console.error('❌ No access_token in backend response');
           }
         } catch (error) {
-          console.error('Failed to sync Privy user:', error);
+          console.error('❌ Failed to sync Privy user:', error);
+          const errorDetail = error.response?.data?.detail || error.response?.data?.message || error.message;
+          
+          // Handle role mismatch error (403 from backend) - FATAL, AUTO-LOGOUT
+          if (error.response?.status === 403) {
+            const errorMessage = errorDetail || 'You are registered with a different role. Please select the correct role.';
+            console.error('❌ Role enforcement: User tried to authenticate with wrong role');
+            console.error('Error message:', errorMessage);
+            
+            // Extract correct role from error message if available
+            // Backend format: "This email is registered as {role}. Please select '{role}' from the role dropdown..."
+            let correctRole = null;
+            let roleDisplayName = null;
+            
+            // Try to extract role from the improved backend message
+            const roleMatch1 = errorMessage.match(/registered as (\w+)/i);
+            const roleMatch2 = errorMessage.match(/select ['"]([^'"]+)['"]/i);
+            
+            if (roleMatch1) {
+              correctRole = roleMatch1[1].toLowerCase();
+              // Map backend role names to frontend role names
+              if (correctRole === 'founder' || correctRole === 'startup') {
+                correctRole = 'startup';
+                roleDisplayName = 'Startup';
+              } else if (correctRole === 'student' || correctRole === 'job seeker') {
+                correctRole = 'student';
+                roleDisplayName = 'Job Seeker';
+              } else if (correctRole === 'investor') {
+                roleDisplayName = 'Investor';
+              }
+            } else if (roleMatch2) {
+              roleDisplayName = roleMatch2[1];
+              // Map display name back to role value
+              if (roleDisplayName.toLowerCase().includes('startup') || roleDisplayName.toLowerCase().includes('founder')) {
+                correctRole = 'startup';
+              } else if (roleDisplayName.toLowerCase().includes('job') || roleDisplayName.toLowerCase().includes('student')) {
+                correctRole = 'student';
+              } else if (roleDisplayName.toLowerCase().includes('investor')) {
+                correctRole = 'investor';
+              }
+            }
+            
+            // Store error message for UI display (with correct role if extracted)
+            const displayMessage = roleDisplayName
+              ? `You are registered as ${roleDisplayName}. Please select "${roleDisplayName}" from the role dropdown and try again.`
+              : errorMessage;
+            setAuthError(displayMessage);
+            
+            // Store toast message in sessionStorage for display after redirect
+            // Create a clear, actionable message with the correct role
+            if (typeof window !== 'undefined') {
+              let toastMessage;
+              if (roleDisplayName) {
+                // Create a clear message with the registered role and action
+                toastMessage = {
+                  message: `This email is registered as ${roleDisplayName}. Please select "${roleDisplayName}" from the role dropdown below.`,
+                  registeredRole: roleDisplayName,
+                  correctRole: correctRole,
+                  type: 'role_mismatch'
+                };
+              } else {
+                // Fallback if we couldn't extract the role
+                toastMessage = {
+                  message: errorMessage || 'Role mismatch detected. Please select the correct role from the dropdown.',
+                  type: 'role_mismatch'
+                };
+              }
+              sessionStorage.setItem(ROLE_MISMATCH_MESSAGE_KEY, JSON.stringify(toastMessage));
+              console.log('💾 Stored role mismatch message for toast:', toastMessage);
+            }
+            
+            // AUTO-LOGOUT: Immediately logout from Privy to reset auth state
+            console.log('🔄 Auto-logging out from Privy due to role mismatch...');
+            if (privyAuth && privyAuth.logout) {
+              try {
+                await privyAuth.logout();
+                console.log('✅ Privy logout completed');
+              } catch (logoutErr) {
+                console.error('⚠️ Privy logout error (non-fatal):', logoutErr);
+                // Continue even if Privy logout fails
+              }
+            }
+            
+            // Clear ALL auth state immediately
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              localStorage.removeItem(PENDING_ROLE_STORAGE_KEY);
+              console.log('🧹 Cleared all auth state from localStorage');
+            }
+            setToken(null);
+            setUser(null);
+            
+            // Set syncFailed to prevent infinite retries - FATAL ERROR STATE
+            setSyncFailed(true);
+            setLoading(false);
+            
+            // Redirect to login page to show error and allow role selection
+            // Use setTimeout to ensure state updates complete first
+            setTimeout(() => {
+              if (router.pathname !== '/login' && router.pathname !== '/register') {
+                console.log('🔄 Redirecting to login page due to role mismatch');
+                router.push('/login');
+              }
+            }, 100);
+            
+            return;
+          }
+          
+          console.error('Error details:', error.response?.data || error.message);
         }
       }
       setLoading(false);
     };
 
     syncPrivyUser();
-  }, [privyAuth?.authenticated, privyAuth?.user, privyAuth?.solanaAddress]);
+  }, [privyAuth?.authenticated, privyAuth?.user, privyAuth?.solanaAddress, user, syncFailed, authError]);
+
+  // Reset syncFailed and authError when Privy auth state changes (new login attempt)
+  // Reset when user is fully logged out (no Privy auth, no token, no user)
+  useEffect(() => {
+    const isFullyLoggedOut = !privyAuth?.authenticated && !token && !user;
+    if (isFullyLoggedOut) {
+      // User is completely logged out - clear all error flags to allow fresh login
+      if (syncFailed || authError) {
+        console.log('🧹 Clearing auth error flags - user is fully logged out');
+        setSyncFailed(false);
+        setAuthError(null);
+      }
+    }
+  }, [privyAuth?.authenticated, token, user, syncFailed, authError]);
 
   useEffect(() => {
     // Check for stored token on mount (for non-Privy users)
@@ -114,19 +291,24 @@ export const AuthProvider = ({ children }) => {
     return String(detail);
   };
 
-  const login = async (email, password) => {
+  const login = async (email, password, role = null) => {
     try {
-      const response = await authAPI.login({ email, password });
-      const { access_token, user_id, role } = response.data;
+      // Role-based login: include role in request if provided
+      const loginData = { email, password };
+      if (role) {
+        loginData.role = role;
+      }
+      const response = await authAPI.login(loginData);
+      const { access_token, user_id, role: userRole } = response.data;
       
       // Store token and user info
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', access_token);
-        localStorage.setItem('user', JSON.stringify({ id: user_id, role }));
+        localStorage.setItem('user', JSON.stringify({ id: user_id, role: userRole }));
       }
       
       setToken(access_token);
-      setUser({ id: user_id, role });
+      setUser({ id: user_id, role: userRole });
       
       // Fetch full user data
       const userData = await authAPI.getUser(user_id);
@@ -202,19 +384,36 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    console.log('🚪 Logging out - clearing all auth state...');
+    
+    // Reset ALL auth state - complete reset
+    setSyncFailed(false);
+    setAuthError(null);
+    
+    // Clear app state immediately (synchronous)
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem(PENDING_ROLE_STORAGE_KEY);
+      sessionStorage.removeItem(ROLE_MISMATCH_MESSAGE_KEY);
+      console.log('🧹 Cleared all localStorage and sessionStorage');
     }
     setToken(null);
     setUser(null);
     
-    // Also logout from Privy if available
+    // Logout from Privy - await to ensure it completes
     if (privyAuth && privyAuth.logout) {
-      privyAuth.logout();
+      try {
+        await privyAuth.logout();
+        console.log('✅ Privy logout completed');
+      } catch (err) {
+        console.error('Privy logout error:', err);
+        // Continue with logout even if Privy fails
+      }
     }
     
+    // Redirect immediately
     router.push('/');
   };
 
@@ -226,6 +425,9 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     isAuthenticated: !!token,
+    authError, // Expose auth error for UI display
+    syncFailed, // Expose sync failed state
+    clearAuthError: () => setAuthError(null), // Allow clearing error explicitly
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

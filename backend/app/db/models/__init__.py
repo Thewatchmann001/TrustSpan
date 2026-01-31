@@ -7,6 +7,16 @@ from app.db.models.job_match import JobMatch
 from app.db.models.job_application import JobApplication
 from app.db.models.message import Conversation, Message
 from app.db.models.employee import Employee
+from app.db.models.credential import (
+    Credential,
+    CredentialType,
+    VerificationStatus,
+    CredentialSource,
+    TrustSignal,
+    TrustSignalType,
+    CredentialHash,
+)
+from app.db.models.attestation import Attestation
 
 __all__ = [
     "User",
@@ -20,5 +30,13 @@ __all__ = [
     "Conversation",
     "Message",
     "Employee",
+    "Credential",
+    "CredentialType",
+    "VerificationStatus",
+    "CredentialSource",
+    "TrustSignal",
+    "TrustSignalType",
+    "CredentialHash",
+    "Attestation",
 ]
 

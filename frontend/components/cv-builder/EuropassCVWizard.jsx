@@ -126,8 +126,36 @@ export default function EuropassCVWizard({ onComplete, onCancel }) {
     }
   }, [cvData?.experience?.length, cvData?.education?.length, fetchSkillSuggestions]);
 
+  // Fields that should NOT get AI suggestions (simple input fields)
+  const FIELDS_NO_AI_SUGGESTIONS = [
+    'personal_info.phone',
+    'personal_info.address',
+    'personal_info.first_name',
+    'personal_info.surname',
+    'personal_info.email',
+    'personal_info.date_of_birth',
+    'personal_info.nationality',
+    'personal_info.driving_license',
+    'personal_info.gender',
+    'experience.job_title', // Job titles don't need AI suggestions
+    'experience.company', // Company names don't need AI suggestions
+    'experience.start_date',
+    'experience.end_date',
+    'experience.location',
+    'education.degree',
+    'education.institution',
+    'education.start_date',
+    'education.end_date',
+    'education.field_of_study',
+  ];
+
   // Debounced fetch suggestions - now works even with empty values for proactive suggestions
   const fetchSuggestions = useCallback(async (field, currentValue = "", context = {}, forceFetch = false) => {
+    // CRITICAL: Skip AI suggestions for fields that don't need them
+    if (FIELDS_NO_AI_SUGGESTIONS.includes(field)) {
+      return; // Don't fetch suggestions for simple input fields
+    }
+
     // Allow fetching even with empty values if forceFetch is true (for proactive suggestions)
     if (!forceFetch && (!currentValue || currentValue.length < 3)) {
       // Don't clear suggestions if we're just waiting for more input
@@ -356,11 +384,23 @@ export default function EuropassCVWizard({ onComplete, onCancel }) {
       return updated;
     });
 
-    // Auto-fetch suggestions - now triggers even with shorter input
+    // Auto-fetch suggestions - ONLY for fields that benefit from AI suggestions
+    // Skip suggestions for simple input fields (phone, address, names, dates, etc.)
+    const fieldsThatNeedSuggestions = [
+      'summary', // Professional summary
+      'description', // Experience/education descriptions
+    ];
+    
     if (field !== "experience" && field !== "education") {
       const fieldPath = section === "summary" ? "summary" : `${section}.${field}`;
-      // Fetch suggestions if user has typed at least 3 characters, or if field is empty (proactive)
-      if (value.length >= 3 || value.length === 0) {
+      
+      // Only fetch suggestions for fields that actually need AI help
+      const needsSuggestions = 
+        section === "summary" || // Summary always needs suggestions
+        field === "description" || // Descriptions need suggestions
+        fieldsThatNeedSuggestions.includes(field);
+      
+      if (needsSuggestions && (value.length >= 3 || value.length === 0)) {
         fetchSuggestions(fieldPath, value, { cvData, step: currentStep }, value.length === 0);
       }
     }

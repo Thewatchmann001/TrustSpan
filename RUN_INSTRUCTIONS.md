@@ -128,10 +128,10 @@ All configuration is in:
 
 **Backend (.env):**
 - `DATABASE_URL=postgresql://trustbridge:trustbridge@localhost:5432/trustbridgedb`
-- `MISTRAL_API_KEY=GdIifsPZmtuRu16zlwFZpu4jXjxBOI0i`
+- `MISTRAL_API_KEY=your_mistral_api_key_here` (Get from https://mistral.ai/)
 - `SOLANA_RPC_URL=https://api.devnet.solana.com`
 - `WALLET_PATH=~/.config/solana/id.json`
-- Your Wallet Address: `AEUc2iSkkkDeRNMLT52HCGMvyGrn17RtayN3DgMvomU4`
+- See `backend/.env.example` for all required variables
 
 **Frontend (.env.local):**
 - `NEXT_PUBLIC_API_URL=http://localhost:8000`

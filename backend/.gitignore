@@ -1,3 +1,5 @@
+# Backend .gitignore
+
 # Python
 __pycache__/
 *.py[cod]
@@ -19,39 +21,79 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Virtual Environment
 venv/
 env/
 ENV/
 .venv
+venv.bak/
+env.bak/
 
-# Environment variables
+# Environment variables - CRITICAL: Never commit these!
 .env
+.env.*
 .env.local
+.envs
+.envs/*
+!.env.example
+*.env
+*.key
 
 # IDE
 .vscode/
 .idea/
+.cursor/
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+coverage.xml
+*.cover
 
 # Database
 *.db
 *.sqlite
+*.sqlite3
+*.db-journal
 
 # Logs
 *.log
 logs/
+*.log.*
 
-# OS
+# Static uploads (user-uploaded files)
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+*.bak
+
+# OS files
 .DS_Store
+.DS_Store?
+._*
 Thumbs.db
+ehthumbs.db
 
+# Secrets and credentials
+secrets/
+credentials/
+*.pem
+*.p12
+*.pfx

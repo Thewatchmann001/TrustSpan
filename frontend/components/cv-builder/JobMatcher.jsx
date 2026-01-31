@@ -251,7 +251,7 @@ export default function JobMatcher({ cvData }) {
               Copy
             </button>
             <button
-              onClick={() => toast.info("Save functionality coming soon")}
+              onClick={() => toast("Save functionality coming soon", { icon: 'ℹ️' })}
               className="btn-primary flex items-center gap-2"
             >
               <Download className="w-4 h-4" />

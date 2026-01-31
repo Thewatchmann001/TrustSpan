@@ -97,19 +97,23 @@ class PDFParserService:
             from mistralai import Mistral
             client = Mistral(api_key=self.mistral_key)
             
-            prompt = f"""You are an expert CV parser. Extract structured information from this LinkedIn CV text.
+            prompt = f"""You are an expert CV parser. Extract ALL structured information from this LinkedIn CV text.
 
 CV Text:
 {pdf_text[:8000]}
 
-Return ONLY valid JSON in this exact format (no markdown, no code blocks):
+IMPORTANT: Extract EVERYTHING you can find. Be thorough and comprehensive.
+
+Return ONLY valid JSON in this exact format (no markdown, no code blocks, no explanations):
 {{
   "personal_info": {{
     "first_name": "",
     "surname": "",
+    "full_name": "",
     "email": "",
     "phone": "",
     "address": "",
+    "location": "",
     "linkedin": "",
     "nationality": ""
   }},
@@ -117,53 +121,93 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks):
   "experience": [
     {{
       "job_title": "",
+      "position": "",
       "company": "",
+      "employer": "",
       "location": "",
       "start_date": "",
       "end_date": "",
-      "description": ""
+      "description": "",
+      "responsibilities": ""
     }}
   ],
   "education": [
     {{
       "degree": "",
+      "qualification": "",
       "institution": "",
+      "school": "",
+      "university": "",
       "field_of_study": "",
+      "major": "",
       "start_date": "",
       "end_date": "",
-      "grade": ""
+      "graduation_year": "",
+      "grade": "",
+      "gpa": ""
     }}
   ],
   "skills": {{
     "technical": [],
+    "job_related_skills": [],
+    "computer_skills": [],
+    "programming_skills": [],
     "soft": [],
+    "social_skills": [],
     "languages": []
   }},
   "certifications": [
     {{
       "name": "",
       "issuer": "",
-      "date": ""
+      "date": "",
+      "expiry_date": ""
     }}
   ],
   "projects": [],
-  "awards": []
+  "awards": [],
+  "publications": []
 }}
 
-Extract all available information. Use empty strings or arrays if information is not found."""
+CRITICAL INSTRUCTIONS:
+1. Extract ALL experience entries - look for job titles, companies, dates, descriptions
+2. Extract ALL education entries - look for degrees, institutions, fields of study, dates
+3. Extract ALL skills - look for technical skills, programming languages, tools, soft skills, languages
+4. Extract the professional summary if present
+5. Be comprehensive - don't skip any information
+6. If you see multiple formats (e.g., "job_title" vs "position"), include both
+7. Return valid JSON only - no markdown, no code blocks"""
             
-            response = client.chat.complete(
-                model="mistral-medium-latest",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a CV parsing expert. Extract structured data and return ONLY valid JSON, no markdown formatting."
-                    },
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.1,  # Low temperature for consistent parsing
-                max_tokens=4000
-            )
+            # Try mistral-small-latest first to avoid rate limits, fallback to medium
+            try:
+                response = client.chat.complete(
+                    model="mistral-small-latest",
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are a CV parsing expert. Extract ALL structured data comprehensively. Return ONLY valid JSON, no markdown formatting, no explanations."
+                        },
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.1,  # Low temperature for consistent parsing
+                    max_tokens=4000
+                )
+            except Exception as small_error:
+                logger.warning(f"mistral-small-latest failed for CV parsing, trying mistral-medium-latest: {str(small_error)}")
+                import time
+                time.sleep(2)
+                response = client.chat.complete(
+                    model="mistral-medium-latest",
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are a CV parsing expert. Extract ALL structured data comprehensively. Return ONLY valid JSON, no markdown formatting, no explanations."
+                        },
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.1,
+                    max_tokens=4000
+                )
             
             content = response.choices[0].message.content.strip()
             
@@ -177,7 +221,13 @@ Extract all available information. Use empty strings or arrays if information is
             import json
             cv_data = json.loads(content)
             
-            logger.info("Successfully parsed CV with Mistral AI")
+            # Log extraction results
+            exp_count = len(cv_data.get("experience", []))
+            edu_count = len(cv_data.get("education", []))
+            skills_data = cv_data.get("skills", {})
+            tech_skills_count = len(skills_data.get("technical", [])) if isinstance(skills_data, dict) else 0
+            logger.info(f"CV Parsed: {exp_count} experience, {edu_count} education, {tech_skills_count} technical skills")
+            
             return cv_data
             
         except Exception as e:
@@ -249,25 +299,64 @@ Extract all available information. Use empty strings or arrays if information is
     def validate_cv_data(self, cv_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Validate and clean extracted CV data.
+        Normalizes data structure to ensure consistent format.
         
         Args:
             cv_data: Extracted CV data
             
         Returns:
-            Validated and cleaned CV data
+            Validated and cleaned CV data with normalized structure
         """
         # Ensure required fields exist
         if "personal_info" not in cv_data:
             cv_data["personal_info"] = {}
         
-        if "experience" not in cv_data:
-            cv_data["experience"] = []
+        # Normalize experience - ensure both 'experience' and 'work_experience' point to same data
+        experience = cv_data.get("experience", cv_data.get("work_experience", []))
+        if not isinstance(experience, list):
+            experience = []
+        cv_data["experience"] = experience
+        cv_data["work_experience"] = experience  # Also set work_experience for compatibility
         
+        # Normalize education
         if "education" not in cv_data:
             cv_data["education"] = []
+        if not isinstance(cv_data["education"], list):
+            cv_data["education"] = []
         
-        if "skills" not in cv_data:
-            cv_data["skills"] = {"technical": [], "soft": [], "languages": []}
+        # Normalize skills - handle multiple formats (strings, lists, nested dicts)
+        skills = cv_data.get("skills", cv_data.get("personal_skills", {}))
+        if not isinstance(skills, dict):
+            skills = {}
+        
+        # Helper function to convert string skills to list
+        def normalize_skill_list(skill_data):
+            """Convert skill data (string or list) to a proper list."""
+            if isinstance(skill_data, list):
+                return [s.strip() for s in skill_data if isinstance(s, str) and s.strip()]
+            elif isinstance(skill_data, str) and skill_data.strip():
+                # Split by comma, pipe, or semicolon
+                return [s.strip() for s in re.split(r'[,|;]', skill_data) if s.strip()]
+            else:
+                return []
+        
+        # Ensure skills has standard structure - convert all to lists
+        normalized_skills = {
+            "technical": normalize_skill_list(skills.get("technical") or skills.get("job_related_skills") or skills.get("technical_skills") or []),
+            "soft": normalize_skill_list(skills.get("soft") or skills.get("social_skills") or []),
+            "languages": normalize_skill_list(skills.get("languages") or []),
+            "computer_skills": normalize_skill_list(skills.get("computer_skills") or skills.get("programming_skills") or []),
+            # Also keep Europass format for compatibility
+            "job_related_skills": normalize_skill_list(skills.get("job_related_skills") or skills.get("technical") or []),
+            "social_skills": normalize_skill_list(skills.get("social_skills") or skills.get("soft") or []),
+            # Also add any additional skill categories from the original data
+            "tools": normalize_skill_list(skills.get("tools") or []),
+            "blockchain": normalize_skill_list(skills.get("blockchain") or []),
+            "databases": normalize_skill_list(skills.get("databases") or []),
+            "frameworks": normalize_skill_list(skills.get("frameworks") or []),
+        }
+        cv_data["skills"] = normalized_skills
+        cv_data["personal_skills"] = normalized_skills  # Also set personal_skills for compatibility
         
         # Clean email
         if cv_data["personal_info"].get("email"):
@@ -279,5 +368,14 @@ Extract all available information. Use empty strings or arrays if information is
         if cv_data["personal_info"].get("phone"):
             phone = re.sub(r'[^\d\+\-\(\)\s]', '', cv_data["personal_info"]["phone"])
             cv_data["personal_info"]["phone"] = phone.strip()
+        
+        # Ensure full_name is set
+        if not cv_data["personal_info"].get("full_name"):
+            first = cv_data["personal_info"].get("first_name", "")
+            surname = cv_data["personal_info"].get("surname", "")
+            if first or surname:
+                cv_data["personal_info"]["full_name"] = f"{first} {surname}".strip()
+        
+        logger.info(f"Validated CV data: {len(experience)} experience, {len(cv_data['education'])} education, {len(normalized_skills.get('technical', []))} technical skills")
         
         return cv_data

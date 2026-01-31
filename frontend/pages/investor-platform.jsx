@@ -10,7 +10,9 @@ import StartupListEnhanced from "../investor/StartupListEnhanced";
 import StartupDetails from "../investor/StartupDetails";
 import InvestFlow from "../investor/InvestFlow";
 import WalletConnect from "../investor/WalletConnect";
-import { TrendingUp, Wallet, Shield, ExternalLink, Clock } from "lucide-react";
+import BackgroundImage from "../components/BackgroundImage";
+import { TrendingUp, Wallet, Shield, ExternalLink, Clock, Download } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function InvestorPlatformPage() {
   const { user } = useAuth();
@@ -60,19 +62,71 @@ export default function InvestorPlatformPage() {
     fetchPortfolio();
   };
 
+  const handleDownloadReceipt = async (investmentId) => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/investments/${investmentId}/receipt`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to download receipt');
+      }
+      
+      // Get filename from Content-Disposition header or use default
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `Investment-Receipt-${investmentId}.pdf`;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+      
+      // Create blob and download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success('Receipt downloaded successfully!');
+    } catch (error) {
+      console.error('Error downloading receipt:', error);
+      toast.error('Failed to download receipt');
+    }
+  };
+
   if (!user) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Diaspora Investment Platform</h1>
-          <p className="text-gray-600">
-            Invest in verified Sierra Leone startups using USDC stablecoins. Zero fees, zero currency risk.
-          </p>
+    <div className="min-h-screen bg-slate-50">
+      {/* Header Section with Background */}
+      <BackgroundImage
+        src="/images/backgrounds/hero/investor-hero.jpg"
+        alt="Investor Platform - TrustBridge"
+        overlay="default"
+        className="h-64 flex-shrink-0"
+        priority={true}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-12 h-full flex items-end">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
+              Diaspora Investment Platform
+            </h1>
+            <p className="text-xl text-white font-semibold max-w-3xl">
+              Invest in verified startups. Zero fees. Full transparency. Blockchain-verified credibility.
+            </p>
+          </div>
         </div>
+      </BackgroundImage>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
 
         {/* Wallet Connection */}
         <div className="mb-8">
@@ -86,27 +140,27 @@ export default function InvestorPlatformPage() {
 
         {/* Portfolio Summary */}
         {portfolio && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">Your Portfolio</h2>
-              <TrendingUp className="w-6 h-6 text-blue-600" />
+          <div className="card-premium mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-slate-900">Your Portfolio</h2>
+              <TrendingUp className="w-6 h-6 text-amber-600" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg p-4">
-                <p className="text-sm text-gray-600">Total Invested</p>
-                <p className="text-2xl font-bold text-blue-600">
+              <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl p-6 border border-slate-200">
+                <p className="text-sm text-slate-600 mb-2">Total Invested</p>
+                <p className="text-3xl font-bold text-amber-600">
                   ${portfolio.total_invested_usdc?.toLocaleString() || "0"} USDC
                 </p>
               </div>
-              <div className="bg-white rounded-lg p-4">
-                <p className="text-sm text-gray-600">Total Investments</p>
-                <p className="text-2xl font-bold text-indigo-600">
+              <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl p-6 border border-slate-200">
+                <p className="text-sm text-slate-600 mb-2">Total Investments</p>
+                <p className="text-3xl font-bold text-sky-600">
                   {portfolio.total_investments || 0}
                 </p>
               </div>
-              <div className="bg-white rounded-lg p-4">
-                <p className="text-sm text-gray-600">Startups</p>
-                <p className="text-2xl font-bold text-purple-600">
+              <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl p-6 border border-slate-200">
+                <p className="text-sm text-slate-600 mb-2">Startups</p>
+                <p className="text-3xl font-bold text-violet-600">
                   {portfolio.startup_count || 0}
                 </p>
               </div>
@@ -116,31 +170,32 @@ export default function InvestorPlatformPage() {
 
         {/* Investment History */}
         {portfolio && portfolio.all_investments && portfolio.all_investments.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <Clock className="w-6 h-6 text-blue-600" />
-              <h2 className="text-2xl font-bold">Investment History</h2>
+          <div className="card mb-8">
+            <div className="flex items-center gap-2 mb-6">
+              <Clock className="w-6 h-6 text-amber-600" />
+              <h2 className="text-2xl font-bold text-slate-900">Investment History</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4">Startup</th>
-                    <th className="text-left py-3 px-4">Amount</th>
-                    <th className="text-left py-3 px-4">Date</th>
-                    <th className="text-left py-3 px-4">Transaction</th>
+                  <tr className="border-b border-slate-200">
+                    <th className="text-left py-3 px-4 text-slate-900 font-semibold">Startup</th>
+                    <th className="text-left py-3 px-4 text-slate-900 font-semibold">Amount</th>
+                    <th className="text-left py-3 px-4 text-slate-900 font-semibold">Date</th>
+                    <th className="text-left py-3 px-4 text-slate-900 font-semibold">Transaction</th>
+                    <th className="text-left py-3 px-4 text-slate-900 font-semibold">Receipt</th>
                   </tr>
                 </thead>
                 <tbody>
                   {portfolio.all_investments.map((investment) => (
-                    <tr key={investment.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4 font-medium">{investment.startup_name}</td>
+                    <tr key={investment.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                      <td className="py-3 px-4 font-medium text-slate-900">{investment.startup_name}</td>
                       <td className="py-3 px-4">
-                        <span className="font-semibold text-blue-600">
+                        <span className="font-semibold text-amber-600">
                           {investment.amount.toLocaleString()} USDC
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-600">
+                      <td className="py-3 px-4 text-sm text-slate-600">
                         {investment.timestamp
                           ? new Date(investment.timestamp).toLocaleDateString()
                           : "N/A"}
@@ -151,18 +206,27 @@ export default function InvestorPlatformPage() {
                             href={investment.explorer_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium text-sm"
+                            className="flex items-center gap-2 text-violet-600 hover:text-violet-700 font-medium text-sm transition-colors"
                           >
                             <ExternalLink className="w-4 h-4" />
                             View on Explorer
                           </a>
                         ) : (
-                          <span className="text-gray-400 text-sm">
+                          <span className="text-slate-400 text-sm">
                             {investment.tx_signature
                               ? `${investment.tx_signature.substring(0, 8)}...`
                               : "Pending"}
                           </span>
                         )}
+                      </td>
+                      <td className="py-3 px-4">
+                        <button
+                          onClick={() => handleDownloadReceipt(investment.id)}
+                          className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 font-medium text-sm transition-colors"
+                        >
+                          <Download className="w-4 h-4" />
+                          Download
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -183,7 +247,7 @@ export default function InvestorPlatformPage() {
               <div>
                 <button
                   onClick={() => setSelectedStartup(null)}
-                  className="mb-4 text-blue-600 hover:underline"
+                  className="mb-4 text-slate-700 hover:text-slate-900 font-medium transition-colors"
                 >
                   ← Back to List
                 </button>
@@ -191,7 +255,7 @@ export default function InvestorPlatformPage() {
                 <div className="mt-6">
                   <button
                     onClick={handleInvest}
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold"
+                    className="btn-cta"
                   >
                     Invest in this Startup
                   </button>
@@ -202,7 +266,7 @@ export default function InvestorPlatformPage() {
               <div>
                 <button
                   onClick={() => setShowInvestFlow(false)}
-                  className="mb-4 text-blue-600 hover:underline"
+                  className="mb-4 text-slate-700 hover:text-slate-900 font-medium transition-colors"
                 >
                   ← Back to Details
                 </button>

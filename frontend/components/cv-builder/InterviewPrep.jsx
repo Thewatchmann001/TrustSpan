@@ -21,30 +21,76 @@ export default function InterviewPrep({ cvData }) {
       return;
     }
 
+    if (!cvData) {
+      toast.error("CV data is required. Please upload or create a CV first.");
+      return;
+    }
+
     setLoading(true);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.93:8000";
       const endpoint = apiUrl + "/api/cv/generate-interview-questions";
+      
+      // Normalize CV data structure
+      const normalizedCvData = cvData.json_content || cvData;
+      
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          cv_data: cvData,
+          cv_data: normalizedCvData,
           job_description: jobDescription,
         }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: response.statusText }));
+        throw new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const result = await response.json();
       
-      if (result.success) {
-        setQuestions(result.questions);
-        toast.success("Interview questions generated!");
+      if (result.success && result.questions) {
+        // Validate and normalize questions structure
+        if (typeof result.questions === 'object' && Object.keys(result.questions).length > 0) {
+          // Ensure all categories are arrays
+          const normalizedQuestions = {
+            behavioral: Array.isArray(result.questions.behavioral) ? result.questions.behavioral : [],
+            technical: Array.isArray(result.questions.technical) ? result.questions.technical : [],
+            situational: Array.isArray(result.questions.situational) ? result.questions.situational : []
+          };
+          
+          // If categories are missing or not arrays, try to extract them
+          for (const key in result.questions) {
+            if (!normalizedQuestions.hasOwnProperty(key)) {
+              if (Array.isArray(result.questions[key])) {
+                normalizedQuestions[key] = result.questions[key];
+              }
+            }
+          }
+          
+          setQuestions(normalizedQuestions);
+          toast.success("Interview questions generated successfully!");
+        } else {
+          throw new Error("Invalid questions format received from server");
+        }
       } else {
-        toast.error("Failed to generate questions");
+        const errorMsg = result.error || result.message || "Failed to generate questions";
+        throw new Error(errorMsg);
       }
     } catch (error) {
-      toast.error("Error generating questions");
-      console.error(error);
+      console.error("Interview Prep Error:", error);
+      const errorMessage = error.message || "Error generating questions. Please try again.";
+      toast.error(errorMessage);
+      
+      // Show detailed error in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Full error details:", {
+          error,
+          cvData: cvData ? Object.keys(cvData) : null,
+          jobDescriptionLength: jobDescription.length
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -116,7 +162,8 @@ export default function InterviewPrep({ cvData }) {
 
           {/* Questions List */}
           <div className="space-y-4">
-            {questions[currentCategory]?.map((q, idx) => {
+            {Array.isArray(questions[currentCategory]) && questions[currentCategory].length > 0 ? (
+              questions[currentCategory].map((q, idx) => {
               const questionId = `${currentCategory}-${idx}`;
               const userAnswer = userAnswers[questionId];
               const showModelAnswer = showFeedback[questionId];
@@ -201,7 +248,12 @@ export default function InterviewPrep({ cvData }) {
                   </div>
                 </div>
               );
-            })}
+              })
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>No questions available for this category.</p>
+              </div>
+            )}
           </div>
 
           <button

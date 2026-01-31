@@ -474,129 +474,129 @@ def seed_database():
         #     startups = db.query(Startup).all()
         #     if startups:
         #         jobs_data = [
-                # Technology Jobs
-                {
-                    "startup_id": startups[0].id,  # TechInnovate
-                    "title": "Senior Software Engineer",
-                    "description": "Build scalable backend systems using Python and FastAPI. Work on blockchain integration and API development.",
-                    "location": "Freetown, Western Area",
-                    "skills_required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
-                    "min_experience": 3,
-                },
-                {
-                    "startup_id": startups[0].id,
-                    "title": "Frontend Developer",
-                    "description": "Create beautiful user interfaces with React and Next.js. Implement responsive designs and optimize performance.",
-                    "location": "Bo, Southern Province",
-                    "skills_required": ["React", "Next.js", "TypeScript", "Tailwind CSS"],
-                    "min_experience": 2,
-                },
-                {
-                    "startup_id": startups[0].id,
-                    "title": "Mobile App Developer",
-                    "description": "Develop mobile applications for iOS and Android platforms. Experience with React Native or Flutter preferred.",
-                    "location": "Kenema, Eastern Province",
-                    "skills_required": ["React Native", "Flutter", "Mobile Development"],
-                    "min_experience": 1,
-                },
-                # Healthcare Jobs
-                {
-                    "startup_id": startups[1].id,  # HealthConnect
-                    "title": "Registered Nurse",
-                    "description": "Provide quality healthcare services in community health centers. Must have nursing qualifications and experience.",
-                    "location": "Makeni, Northern Province",
-                    "skills_required": ["Nursing", "Patient Care", "Medical Records"],
-                    "min_experience": 2,
-                },
-                {
-                    "startup_id": startups[1].id,
-                    "title": "Public Health Officer",
-                    "description": "Develop and implement public health programs. Work on health education and community outreach.",
-                    "location": "Koidu, Kono District",
-                    "skills_required": ["Public Health", "Health Education", "Community Outreach"],
-                    "min_experience": 1,
-                },
-                {
-                    "startup_id": startups[1].id,
-                    "title": "Medical Laboratory Technician",
-                    "description": "Perform laboratory tests and analyze results. Maintain laboratory equipment and records.",
-                    "location": "Freetown, Western Area",
-                    "skills_required": ["Laboratory Techniques", "Medical Testing", "Equipment Maintenance"],
-                    "min_experience": 1,
-                },
-                # Agriculture Jobs
-                {
-                    "startup_id": startups[2].id,  # AgriTech
-                    "title": "Agricultural Extension Officer",
-                    "description": "Provide technical support to farmers. Promote sustainable farming practices and modern agricultural techniques.",
-                    "location": "Kabala, Koinadugu District",
-                    "skills_required": ["Agriculture", "Extension Services", "Farm Management"],
-                    "min_experience": 2,
-                },
-                {
-                    "startup_id": startups[2].id,
-                    "title": "Agribusiness Manager",
-                    "description": "Manage agricultural business operations. Develop business strategies and market agricultural products.",
-                    "location": "Port Loko, Port Loko District",
-                    "skills_required": ["Agribusiness", "Business Management", "Marketing"],
-                    "min_experience": 3,
-                },
-                {
-                    "startup_id": startups[2].id,
-                    "title": "Farm Supervisor",
-                    "description": "Supervise farm operations and workers. Ensure efficient production and quality control.",
-                    "location": "Magburaka, Tonkolili District",
-                    "skills_required": ["Farm Management", "Supervision", "Crop Production"],
-                    "min_experience": 1,
-                },
-                # Education Jobs
-                {
-                    "startup_id": startups[3].id,  # EduBridge
-                    "title": "Primary School Teacher",
-                    "description": "Teach primary school students. Develop lesson plans and assess student progress.",
-                    "location": "Pujehun, Pujehun District",
-                    "skills_required": ["Teaching", "Lesson Planning", "Child Development"],
-                    "min_experience": 1,
-                },
-                {
-                    "startup_id": startups[3].id,
-                    "title": "Education Program Coordinator",
-                    "description": "Coordinate educational programs and initiatives. Work with schools and communities.",
-                    "location": "Bonthe, Bonthe District",
-                    "skills_required": ["Program Coordination", "Education", "Community Engagement"],
-                    "min_experience": 2,
-                },
-                {
-                    "startup_id": startups[3].id,
-                    "title": "Mathematics Teacher",
-                    "description": "Teach mathematics to secondary school students. Help students prepare for examinations.",
-                    "location": "Kailahun, Kailahun District",
-                    "skills_required": ["Mathematics", "Teaching", "Curriculum Development"],
-                    "min_experience": 2,
-                },
-                # Engineering Jobs
-                {
-                    "startup_id": startups[0].id,  # TechInnovate
-                    "title": "Civil Engineer",
-                    "description": "Design and supervise construction projects. Ensure projects meet safety and quality standards.",
-                    "location": "Freetown, Western Area",
-                    "skills_required": ["Civil Engineering", "Project Management", "Construction"],
-                    "min_experience": 3,
-                },
-                {
-                    "startup_id": startups[0].id,
-                    "title": "Electrical Engineer",
-                    "description": "Design electrical systems and installations. Troubleshoot and maintain electrical equipment.",
-                    "location": "Bo, Southern Province",
-                    "skills_required": ["Electrical Engineering", "System Design", "Maintenance"],
-                    "min_experience": 2,
-                },
-            ]
-            
+        #             # Technology Jobs
+        #             {
+        #                 "startup_id": startups[0].id,  # TechInnovate
+        #                 "title": "Senior Software Engineer",
+        #                 "description": "Build scalable backend systems using Python and FastAPI. Work on blockchain integration and API development.",
+        #                 "location": "Freetown, Western Area",
+        #                 "skills_required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+        #                 "min_experience": 3,
+        #             },
+        #             {
+        #                 "startup_id": startups[0].id,
+        #                 "title": "Frontend Developer",
+        #                 "description": "Create beautiful user interfaces with React and Next.js. Implement responsive designs and optimize performance.",
+        #                 "location": "Bo, Southern Province",
+        #                 "skills_required": ["React", "Next.js", "TypeScript", "Tailwind CSS"],
+        #                 "min_experience": 2,
+        #             },
+        #             {
+        #                 "startup_id": startups[0].id,
+        #                 "title": "Mobile App Developer",
+        #                 "description": "Develop mobile applications for iOS and Android platforms. Experience with React Native or Flutter preferred.",
+        #                 "location": "Kenema, Eastern Province",
+        #                 "skills_required": ["React Native", "Flutter", "Mobile Development"],
+        #                 "min_experience": 1,
+        #             },
+        #             # Healthcare Jobs
+        #             {
+        #                 "startup_id": startups[1].id,  # HealthConnect
+        #                 "title": "Registered Nurse",
+        #                 "description": "Provide quality healthcare services in community health centers. Must have nursing qualifications and experience.",
+        #                 "location": "Makeni, Northern Province",
+        #                 "skills_required": ["Nursing", "Patient Care", "Medical Records"],
+        #                 "min_experience": 2,
+        #             },
+        #             {
+        #                 "startup_id": startups[1].id,
+        #                 "title": "Public Health Officer",
+        #                 "description": "Develop and implement public health programs. Work on health education and community outreach.",
+        #                 "location": "Koidu, Kono District",
+        #                 "skills_required": ["Public Health", "Health Education", "Community Outreach"],
+        #                 "min_experience": 1,
+        #             },
+        #             {
+        #                 "startup_id": startups[1].id,
+        #                 "title": "Medical Laboratory Technician",
+        #                 "description": "Perform laboratory tests and analyze results. Maintain laboratory equipment and records.",
+        #                 "location": "Freetown, Western Area",
+        #                 "skills_required": ["Laboratory Techniques", "Medical Testing", "Equipment Maintenance"],
+        #                 "min_experience": 1,
+        #             },
+        #             # Agriculture Jobs
+        #             {
+        #                 "startup_id": startups[2].id,  # AgriTech
+        #                 "title": "Agricultural Extension Officer",
+        #                 "description": "Provide technical support to farmers. Promote sustainable farming practices and modern agricultural techniques.",
+        #                 "location": "Kabala, Koinadugu District",
+        #                 "skills_required": ["Agriculture", "Extension Services", "Farm Management"],
+        #                 "min_experience": 2,
+        #             },
+        #             {
+        #                 "startup_id": startups[2].id,
+        #                 "title": "Agribusiness Manager",
+        #                 "description": "Manage agricultural business operations. Develop business strategies and market agricultural products.",
+        #                 "location": "Port Loko, Port Loko District",
+        #                 "skills_required": ["Agribusiness", "Business Management", "Marketing"],
+        #                 "min_experience": 3,
+        #             },
+        #             {
+        #                 "startup_id": startups[2].id,
+        #                 "title": "Farm Supervisor",
+        #                 "description": "Supervise farm operations and workers. Ensure efficient production and quality control.",
+        #                 "location": "Magburaka, Tonkolili District",
+        #                 "skills_required": ["Farm Management", "Supervision", "Crop Production"],
+        #                 "min_experience": 1,
+        #             },
+        #             # Education Jobs
+        #             {
+        #                 "startup_id": startups[3].id,  # EduBridge
+        #                 "title": "Primary School Teacher",
+        #                 "description": "Teach primary school students. Develop lesson plans and assess student progress.",
+        #                 "location": "Pujehun, Pujehun District",
+        #                 "skills_required": ["Teaching", "Lesson Planning", "Child Development"],
+        #                 "min_experience": 1,
+        #             },
+        #             {
+        #                 "startup_id": startups[3].id,
+        #                 "title": "Education Program Coordinator",
+        #                 "description": "Coordinate educational programs and initiatives. Work with schools and communities.",
+        #                 "location": "Bonthe, Bonthe District",
+        #                 "skills_required": ["Program Coordination", "Education", "Community Engagement"],
+        #                 "min_experience": 2,
+        #             },
+        #             {
+        #                 "startup_id": startups[3].id,
+        #                 "title": "Mathematics Teacher",
+        #                 "description": "Teach mathematics to secondary school students. Help students prepare for examinations.",
+        #                 "location": "Kailahun, Kailahun District",
+        #                 "skills_required": ["Mathematics", "Teaching", "Curriculum Development"],
+        #                 "min_experience": 2,
+        #             },
+        #             # Engineering Jobs
+        #             {
+        #                 "startup_id": startups[0].id,  # TechInnovate
+        #                 "title": "Civil Engineer",
+        #                 "description": "Design and supervise construction projects. Ensure projects meet safety and quality standards.",
+        #                 "location": "Freetown, Western Area",
+        #                 "skills_required": ["Civil Engineering", "Project Management", "Construction"],
+        #                 "min_experience": 3,
+        #             },
+        #             {
+        #                 "startup_id": startups[0].id,
+        #                 "title": "Electrical Engineer",
+        #                 "description": "Design electrical systems and installations. Troubleshoot and maintain electrical equipment.",
+        #                 "location": "Bo, Southern Province",
+        #                 "skills_required": ["Electrical Engineering", "System Design", "Maintenance"],
+        #                 "min_experience": 2,
+        #             },
+        #         ]
+        #
         #         for job_data in jobs_data:
         #             job = Job(**job_data)
         #             db.add(job)
-        #         
+        #
         #         db.commit()
         #         print(f"✅ Created {len(jobs_data)} jobs")
         

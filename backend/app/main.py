@@ -15,8 +15,10 @@ from app.core.config import settings
 from app.utils.logger import logger
 from app.api import users  # Keep users for authentication
 from app.api import messages  # Chat/messaging API
+from app.api import auth  # OAuth authentication
 from app.api.websocket import manager
 from app.core.exceptions import InvalidCredentials, UserNotFound, TrustBridgeException
+from app.core.middleware import RateLimitMiddleware, CSRFProtectionMiddleware
 from routes import router as main_router  # New consolidated routes
 
 # Removed: certificates, startups (old), jobs (old), cv (old), investments (old)
@@ -46,8 +48,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Security middleware (order matters: CSRF first, then rate limiting)
+app.add_middleware(CSRFProtectionMiddleware)
+app.add_middleware(RateLimitMiddleware)
+
 # Include routers
 app.include_router(users.router)  # Keep for authentication
+app.include_router(auth.router)  # OAuth authentication (Google, etc.)
 app.include_router(messages.router)  # Chat/messaging
 app.include_router(main_router)  # New consolidated routes for CV and Investments
 

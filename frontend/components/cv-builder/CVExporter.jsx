@@ -36,7 +36,7 @@ export default function CVExporter({ cvData, userId }) {
   };
 
   const handleExportDOCX = async () => {
-    toast.info("DOCX export coming soon. Use PDF export for now.");
+    toast("DOCX export coming soon. Use PDF export for now.", { icon: 'ℹ️' });
   };
 
   const handleCreateShareLink = async () => {

@@ -216,6 +216,35 @@ export default function Chat({
     const file = e.target.files?.[0];
     if (!file || !conversation) return;
 
+    // Validate file size (10MB max)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      toast.error("File size must be less than 10MB");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'image/webp'
+    ];
+    if (!allowedTypes.includes(file.type) && !file.name.match(/\.(pdf|doc|docx|jpg|jpeg|png|gif|webp)$/i)) {
+      toast.error("File type not supported. Please upload PDF, DOC, DOCX, or image files.");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
     try {
       setUploadingFile(true);
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -232,7 +261,8 @@ export default function Chat({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to upload file");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || "Failed to upload file");
       }
 
       const messageData = await response.json();
@@ -247,7 +277,7 @@ export default function Chat({
       }
     } catch (error) {
       console.error("Error uploading file:", error);
-      toast.error("Failed to share file");
+      toast.error(error.message || "Failed to share file");
     } finally {
       setUploadingFile(false);
     }
@@ -351,9 +381,68 @@ export default function Chat({
                     </p>
 
                     {/* File Attachment */}
-                    {message.file_url && (
-                      <div
-                        className={`mt-3 p-3 rounded-lg flex items-center justify-between ${
+                    {message.file_url && (() => {
+                      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+                      const fullFileUrl = message.file_url.startsWith('http') 
+                        ? message.file_url 
+                        : `${apiUrl}${message.file_url}`;
+                      const isImage = message.file_type?.startsWith('image/') || 
+                        /\.(jpg|jpeg|png|gif|webp)$/i.test(message.file_name || '');
+                      
+                      return (
+                        <div className="mt-3">
+                          {isImage ? (
+                            // Image preview
+                            <div className="rounded-lg overflow-hidden">
+                              <a
+                                href={fullFileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block"
+                              >
+                                <img
+                                  src={fullFileUrl}
+                                  alt={message.file_name}
+                                  className="max-w-full h-auto rounded-lg cursor-pointer hover:opacity-90 transition"
+                                  onError={(e) => {
+                                    // Fallback if image fails to load
+                                    e.target.style.display = 'none';
+                                    e.target.nextSibling.style.display = 'block';
+                                  }}
+                                />
+                              </a>
+                              <div
+                                className={`p-3 rounded-lg flex items-center justify-between ${
+                                  isOwnMessage ? "bg-blue-500" : "bg-gray-300"
+                                }`}
+                                style={{ display: 'none' }}
+                              >
+                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                  <Upload className="w-4 h-4 flex-shrink-0" />
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-xs font-semibold truncate">
+                                      {message.file_name}
+                                    </p>
+                                    <p className="text-xs opacity-75">{fileSize} KB</p>
+                                  </div>
+                                </div>
+                                <a
+                                  href={fullFileUrl}
+                                  download
+                                  className={`flex-shrink-0 p-2 rounded hover:opacity-80 transition ml-2 ${
+                                    isOwnMessage
+                                      ? "bg-blue-500 text-white"
+                                      : "bg-gray-400 text-gray-800"
+                                  }`}
+                                >
+                                  <Download className="w-4 h-4" />
+                                </a>
+                              </div>
+                            </div>
+                          ) : (
+                            // File download button
+                            <div
+                              className={`p-3 rounded-lg flex items-center justify-between ${
                           isOwnMessage ? "bg-blue-500" : "bg-gray-300"
                         }`}
                       >
@@ -367,8 +456,10 @@ export default function Chat({
                           </div>
                         </div>
                         <a
-                          href={message.file_url}
-                          download
+                                href={`${apiUrl}/api/messages/file/${message.id}`}
+                                download={message.file_name}
+                                target="_blank"
+                                rel="noopener noreferrer"
                           className={`flex-shrink-0 p-2 rounded hover:opacity-80 transition ml-2 ${
                             isOwnMessage
                               ? "bg-blue-500 text-white"
@@ -379,6 +470,9 @@ export default function Chat({
                         </a>
                       </div>
                     )}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   <div
@@ -431,6 +525,7 @@ export default function Chat({
           <input
             ref={fileInputRef}
             type="file"
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"
             onChange={handleFileSelect}
             disabled={uploadingFile || sending}
             className="hidden"

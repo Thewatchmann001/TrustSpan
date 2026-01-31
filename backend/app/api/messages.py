@@ -2,18 +2,21 @@
 Chat/Messaging API
 Handles conversations and messages between investors and startups
 """
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 import os
 import uuid
+from pathlib import Path
 
 from app.db.session import get_db
 from app.db.models import Conversation, Message, User, Startup
 from app.utils.logger import logger
 from app.api.websocket import notify_new_message
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -435,14 +438,39 @@ async def mark_conversation_read(
 
 @router.post("/api/messages/file-upload")
 async def upload_file_message(
-    conversation_id: int,
-    sender_id: int,
     file: UploadFile = File(...),
-    message_content: str = "",
+    conversation_id: int = Form(...),
+    sender_id: int = Form(...),
+    message_content: str = Form(""),
     db: Session = Depends(get_db)
 ):
     """Send a message with a file attachment"""
     try:
+        # Validate file
+        if not file.filename:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No file provided"
+            )
+        
+        # Validate file size (10MB max)
+        contents = await file.read()
+        file_size_mb = len(contents) / (1024 * 1024)
+        if file_size_mb > 10:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"File size ({file_size_mb:.2f}MB) exceeds maximum allowed size of 10MB"
+            )
+        
+        # Validate file type
+        allowed_extensions = {'.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.gif', '.webp'}
+        file_extension = os.path.splitext(file.filename)[1].lower()
+        if file_extension not in allowed_extensions:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"File type {file_extension} not allowed. Allowed types: PDF, DOC, DOCX, JPG, PNG, GIF, WEBP"
+            )
+        
         # Verify conversation exists
         conversation = db.query(Conversation).filter(
             Conversation.id == conversation_id
@@ -464,16 +492,18 @@ async def upload_file_message(
                 )
         
         # Create uploads directory if it doesn't exist
-        upload_dir = "static/uploads/messages"
-        os.makedirs(upload_dir, exist_ok=True)
+        from app.core.config import settings
+        from pathlib import Path
+        
+        upload_base = Path(settings.UPLOAD_DIR)
+        upload_dir = upload_base / "messages"
+        upload_dir.mkdir(parents=True, exist_ok=True)
         
         # Generate unique filename
-        file_extension = os.path.splitext(file.filename)[1]
         unique_filename = f"{uuid.uuid4()}{file_extension}"
-        file_path = os.path.join(upload_dir, unique_filename)
+        file_path = upload_dir / unique_filename
         
         # Save file
-        contents = await file.read()
         with open(file_path, "wb") as f:
             f.write(contents)
         
@@ -528,4 +558,50 @@ async def upload_file_message(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to upload file: {str(e)}"
+        )
+
+
+@router.get("/api/messages/file/{message_id}")
+async def download_message_file(
+    message_id: int,
+    db: Session = Depends(get_db)
+):
+    """Download a file attached to a message"""
+    try:
+        # Get message
+        message = db.query(Message).filter(Message.id == message_id).first()
+        
+        if not message or not message.file_url:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="File not found"
+            )
+        
+        # Extract filename from file_url
+        # file_url format: /static/uploads/messages/{filename}
+        filename = message.file_url.split('/')[-1]
+        
+        # Build file path
+        upload_base = Path(settings.UPLOAD_DIR)
+        file_path = upload_base / "messages" / filename
+        
+        if not file_path.exists():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="File not found on server"
+            )
+        
+        # Return file with proper headers
+        return FileResponse(
+            path=str(file_path),
+            filename=message.file_name or filename,
+            media_type=message.file_type or "application/octet-stream"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error downloading file: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to download file: {str(e)}"
         )

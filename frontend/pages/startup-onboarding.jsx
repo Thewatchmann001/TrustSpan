@@ -77,7 +77,54 @@ export default function StartupOnboarding() {
     } else {
       setSolanaAddress("");
     }
+    // Load existing startup data if editing
+    fetchExistingStartup();
   }, [isAuthenticated, router, user]);
+
+  const fetchExistingStartup = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/startups/by-founder/${user.id}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Preload all form data from existing startup
+        setFormData({
+          name: data.name || "",
+          sector: data.sector || "",
+          country: data.country || "Sierra Leone",
+          year_founded: data.year_founded || new Date().getFullYear(),
+          website: data.website || "",
+          contact_email: data.contact_email || "",
+          phone: data.phone || "",
+          address: data.address || "",
+          mission: data.mission || "",
+          vision: data.vision || "",
+          description: data.description || "",
+          products_services: data.products_services || "",
+          funding_goal: data.funding_goal ? data.funding_goal.toString() : "",
+          pitch_deck_url: data.pitch_deck_url || "",
+          team_size: data.team_size ? data.team_size.toString() : "",
+          founder_experience_years: data.founder_experience_years ? data.founder_experience_years.toString() : "",
+        });
+        
+        // Set wallet address if available
+        if (data.wallet_address) {
+          setSolanaAddress(data.wallet_address);
+        }
+        
+        toast.success("Loaded existing startup data. You can edit and save changes.");
+      } else if (response.status !== 404) {
+        // 404 is expected for new startups, other errors should be logged
+        console.error("Failed to fetch startup data:", response.status);
+      }
+    } catch (error) {
+      // Silent fail - new startup creation flow
+      console.log("No existing startup found, creating new one...");
+    }
+  };
 
   const validateSolanaAddress = (address) => {
     if (!address || !address.trim()) return false;
@@ -215,7 +262,7 @@ export default function StartupOnboarding() {
           error.detail &&
           error.detail.includes("already have a registered startup")
         ) {
-          toast.info("You already have a startup. Redirecting to dashboard...");
+          toast("You already have a startup. Redirecting to dashboard...", { icon: 'ℹ️' });
           router.push("/startup-dashboard");
         } else {
           toast.error(error.detail || "Failed to create startup profile");

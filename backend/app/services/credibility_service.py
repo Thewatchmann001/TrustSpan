@@ -1,6 +1,6 @@
 from typing import Dict, Any
 from sqlalchemy.orm import Session
-from app.db.models import Startup, Investment, User
+from app.db.models import Startup, Investment, User, Attestation
 from app.utils.logger import logger
 
 
@@ -19,8 +19,9 @@ class CredibilityService:
         - Product Traction (25 points max): MVP status + user base + revenue
         - Investment Traction (15 points max): Investor backing
         - On-Chain Verification (10 points): Blockchain registration (optional bonus)
+        - Attestation Verification (35 points max): Identity (10) + Business (15) + Both Bonus (5) + On-Chain Bonus (5)
         
-        Total: 100 points possible
+        Total: 100+ points possible (capped at 100, but attestations can push above)
         """
         logger.info(f"Calculating credibility for startup {startup_id}")
         
@@ -39,33 +40,66 @@ class CredibilityService:
         employee_points = min(15, employees_verified * 3)  # 3 points per employee (up to 5)
         team_score += employee_points
         
-        # Founder experience (10 points max) - Alternative to on-chain verification
+        # Founder experience (10 points max) - Now uses credentials (single source of truth)
         founder = db.query(User).filter(User.id == startup.founder_id).first()
-        founder_experience = startup.founder_experience_years or 0
         
+        # Get founder's verified credentials
+        from app.services.trust_service import CredentialService, TrustScoreService
+        from app.db.models import CredentialType, VerificationStatus
+        
+        credential_service = CredentialService()
+        trust_service = TrustScoreService()
+        
+        # Get founder's verified credentials
+        founder_creds = credential_service.get_user_credentials(
+            db, startup.founder_id, verification_status=VerificationStatus.VERIFIED
+        )
+        
+        # Get founder's trust score
+        founder_trust = trust_service.calculate_user_trust_score(db, startup.founder_id)
+        
+        # Calculate founder points based on verified credentials
         # Multiple paths to earn founder points:
-        # 1. On-chain verified founder (10 points)
-        # 2. Founder with 5+ years experience (8 points)
-        # 3. Founder with 3-5 years experience (5 points)
-        # 4. Founder profile verified (3 points)
+        # 1. High trust score (80+) with verified credentials (10 points)
+        # 2. Verified education + verified employment (10 points)
+        # 3. Verified education OR verified employment (7 points)
+        # 4. On-chain verified founder (10 points)
+        # 5. Founder with 5+ years experience (8 points)
+        # 6. Founder with 3-5 years experience (5 points)
+        # 7. Founder profile verified (3 points)
         founder_points = 0
+        
+        verified_education = [c for c in founder_creds if c.type == CredentialType.EDUCATION]
+        verified_employment = [c for c in founder_creds if c.type == CredentialType.EMPLOYMENT]
+        verified_startup_roles = [c for c in founder_creds if c.type == CredentialType.STARTUP_ROLE]
+        
         if founder and founder.verified_on_chain == "verified":
             founder_points = 10
-        elif founder_experience >= 5:
+        elif founder_trust["trust_score"] >= 80 and len(founder_creds) >= 2:
+            founder_points = 10
+        elif len(verified_education) > 0 and len(verified_employment) > 0:
+            founder_points = 10
+        elif len(verified_education) > 0 or len(verified_employment) > 0:
+            founder_points = 7
+        elif startup.founder_experience_years and startup.founder_experience_years >= 5:
             founder_points = 8
-        elif founder_experience >= 3:
+        elif startup.founder_experience_years and startup.founder_experience_years >= 3:
             founder_points = 5
         elif startup.founder_profile_verified:
             founder_points = 3
+        elif len(verified_startup_roles) > 0:
+            founder_points = 3  # At least has startup role credential
         
         team_score += founder_points
         
         factors["team_credibility"] = {
             "verified_employees": employees_verified,
             "employee_points": employee_points,
-            "founder_experience_years": founder_experience,
+            "founder_experience_years": startup.founder_experience_years or 0,
             "founder_profile_verified": startup.founder_profile_verified,
             "founder_points": founder_points,
+            "founder_trust_score": founder_trust.get("trust_score", 0.0),
+            "founder_verified_credentials": len(founder_creds),
             "total": team_score
         }
         score += team_score
@@ -154,7 +188,78 @@ class CredibilityService:
         }
         score += on_chain_score
         
-        # Cap at 100 points
+        # ===== FACTOR 6: ATTESTATION VERIFICATION (10 points - BONUS) =====
+        attestation_score = 0.0
+        attestation_details = {}
+        
+        # Check for attestations
+        try:
+            founder_attestations = db.query(Attestation).filter(
+                Attestation.user_id == startup.founder_id,
+                Attestation.status == "verified"
+            ).all()
+            
+            logger.info(f"Found {len(founder_attestations)} verified attestations for founder {startup.founder_id}")
+            for att in founder_attestations:
+                logger.info(f"  - Schema: {att.schema}, Status: {att.status}, On-chain: {att.on_chain}")
+            
+            # Business ownership attestation (15 points - significant trust signal)
+            has_business_attestation = any(
+                att.schema == "business_ownership" and att.status == "verified"
+                for att in founder_attestations
+            )
+            if has_business_attestation:
+                attestation_score += 15
+                attestation_details["business_attestation"] = True
+                logger.info(f"Business attestation found: +15 points")
+            
+            # Identity/KYC attestation (10 points - important trust signal)
+            # Check for both "identity" and "kyc_identity" schemas for compatibility
+            has_identity_attestation = any(
+                (att.schema == "identity" or att.schema == "kyc_identity") and att.status == "verified"
+                for att in founder_attestations
+            )
+            if has_identity_attestation:
+                attestation_score += 10
+                attestation_details["identity_attestation"] = True
+                logger.info(f"Identity attestation found: +10 points")
+            
+            # Bonus for having BOTH identity AND business verified (5 points)
+            if has_business_attestation and has_identity_attestation:
+                attestation_score += 5
+                attestation_details["both_verified"] = True
+                logger.info(f"Both identity and business verified: +5 bonus points")
+            
+            # On-chain attestation (5 points bonus - shows blockchain commitment)
+            has_on_chain_attestation = any(
+                att.on_chain and att.status == "verified"
+                for att in founder_attestations
+            )
+            if has_on_chain_attestation:
+                attestation_score += 5
+                attestation_details["on_chain_attestation"] = True
+                logger.info(f"On-chain attestation found: +5 bonus points")
+            
+            logger.info(f"Total attestation score: {attestation_score} points")
+            
+            factors["attestation_verification"] = {
+                "total_attestations": len(founder_attestations),
+                "verified_attestations": len([att for att in founder_attestations if att.status == "verified"]),
+                "details": attestation_details,
+                "score": attestation_score
+            }
+        except Exception as e:
+            logger.warning(f"Error checking attestations for startup {startup_id}: {e}")
+            factors["attestation_verification"] = {
+                "total_attestations": 0,
+                "verified_attestations": 0,
+                "details": {},
+                "score": 0.0
+            }
+        
+        score += attestation_score
+        
+        # Cap at 100 points (attestations are bonus, so they can push score above 100, but we cap it)
         final_score = min(100, round(score, 2))
         
         # Update startup credibility score

@@ -29,4 +29,7 @@ httpx>=0.28.0
 loguru==0.7.2
 mistralai>=1.0.0
 qrcode[pil]==7.4.2
+google-auth>=2.23.0
+google-auth-oauthlib>=1.1.0
+google-auth-httplib2>=0.1.1
 

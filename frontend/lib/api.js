@@ -27,6 +27,15 @@ export const authAPI = {
   login: (data) => api.post('/api/users/login', data),
   getUser: (userId) => api.get(`/api/users/${userId}`),
   syncPrivy: (data) => api.post('/api/users/privy/sync', data), // Sync Privy user with backend
+  // OAuth
+  initiateGoogleOAuth: (role = null) => {
+    // Use the same API_BASE_URL as the axios instance
+    const url = role 
+      ? `/api/auth/oauth/google?role=${role}`
+      : '/api/auth/oauth/google';
+    // Return full URL for redirect (OAuth flow)
+    return `${API_BASE_URL}${url}`;
+  },
 };
 
 // Certificate API removed - not part of core solutions
@@ -105,7 +114,7 @@ export const cvAPI = {
   // New endpoints
   getSuggestions: (section, content, industry = null) => 
     api.post('/api/cv/suggestions', { section, content, industry }),
-  searchJobs: (keywords, jobTitles = null, location = null, limit = 50) =>
-    api.post('/api/cv/jobs', { keywords, job_titles: jobTitles, location, limit }),
+  searchJobs: (keywords, jobTitles = null, location = null, limit = 50, userId = null) =>
+    api.post('/api/cv/jobs', { keywords, job_titles: jobTitles, location, limit, user_id: userId }),
 };
 

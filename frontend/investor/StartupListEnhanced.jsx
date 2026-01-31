@@ -105,30 +105,30 @@ export default function StartupListEnhanced({ onStartupSelect }) {
 
   return (
     <div className="startup-list-enhanced">
-      {/* Header with Glassmorphism */}
+      {/* Header with Premium Card Styling */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 mb-6 shadow-xl"
+        className="card-premium bg-gradient-to-r from-sky-50 to-amber-50 border-2 border-sky-200 rounded-2xl p-6 mb-6 shadow-lg"
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-3xl font-bold text-white">Verified Startups</h2>
-          <div className="flex items-center gap-2 text-white/80">
-            <Shield className="w-5 h-5 text-green-400" />
-            <span className="text-sm">Blockchain Verified</span>
+          <h2 className="text-3xl font-bold text-slate-900">Verify & Invest in Startups</h2>
+          <div className="flex items-center gap-2 bg-emerald-100 px-4 py-2 rounded-lg border border-emerald-300">
+            <Shield className="w-5 h-5 text-emerald-700" />
+            <span className="text-sm font-bold text-emerald-900">Blockchain Verified</span>
           </div>
         </div>
 
         {/* Enhanced Search Bar */}
         <div className="mb-4">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-600 w-5 h-5" />
             <input
               type="text"
               placeholder="Search by name, description, or industry..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -137,16 +137,16 @@ export default function StartupListEnhanced({ onStartupSelect }) {
         <div className="flex flex-wrap gap-4">
           {/* Industry Filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm text-white/80 mb-2">Industry</label>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Industry</label>
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-4 h-4" />
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-600 w-4 h-4" />
               <select
                 value={filterSector}
                 onChange={(e) => setFilterSector(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"
               >
                 {INDUSTRIES.map((industry) => (
-                  <option key={industry.value} value={industry.value} className="bg-gray-900">
+                  <option key={industry.value} value={industry.value} className="bg-white">
                     {industry.label}
                   </option>
                 ))}
@@ -156,16 +156,16 @@ export default function StartupListEnhanced({ onStartupSelect }) {
 
           {/* Sort Options */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm text-white/80 mb-2">Sort By</label>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Sort By</label>
             <div className="relative">
-              <ArrowUpDown className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-4 h-4" />
+              <ArrowUpDown className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-600 w-4 h-4" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"
               >
                 {SORT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value} className="bg-gray-900">
+                  <option key={option.value} value={option.value} className="bg-white">
                     {option.label}
                   </option>
                 ))}
@@ -175,7 +175,7 @@ export default function StartupListEnhanced({ onStartupSelect }) {
 
           {/* Credibility Filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm text-white/80 mb-2">
+            <label className="block text-sm font-bold text-slate-900 mb-2">
               Min Credibility: {minCredibility}%
             </label>
             <input
@@ -184,13 +184,13 @@ export default function StartupListEnhanced({ onStartupSelect }) {
               max="100"
               value={minCredibility}
               onChange={(e) => setMinCredibility(Number(e.target.value))}
-              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer"
+              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
             />
           </div>
         </div>
 
         {/* Results Count */}
-        <div className="mt-4 text-sm text-white/60">
+        <div className="mt-4 text-sm font-semibold text-slate-700">
           Showing {filteredAndSortedStartups.length} of {startups.length} startups
         </div>
       </motion.div>
@@ -200,7 +200,7 @@ export default function StartupListEnhanced({ onStartupSelect }) {
         <div className="flex justify-center items-center py-20">
           <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-            <p className="text-white/80 mt-4">Loading startups...</p>
+            <p className="text-slate-700 font-semibold mt-4">Loading startups...</p>
           </div>
         </div>
       ) : filteredAndSortedStartups.length > 0 ? (
@@ -222,7 +222,7 @@ export default function StartupListEnhanced({ onStartupSelect }) {
         </div>
       ) : (
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-12 text-center">
-          <p className="text-white/60 text-lg">No startups found matching your criteria</p>
+          <p className="text-slate-700 font-semibold text-lg">No startups found matching your criteria</p>
           <button
             onClick={() => {
               setSearchTerm("");
