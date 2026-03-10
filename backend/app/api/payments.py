@@ -120,6 +120,8 @@ def _record_stripe_investment(
         startup_id=startup.id,
         investor_id=investor_id,
         amount=amount,
+        escrow_balance=amount,  # Deposit directly into escrow
+        released_amount=0.0,
         tx_signature=f"stripe:{session_id}",
     )
     db.add(investment)

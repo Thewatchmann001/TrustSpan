@@ -50,10 +50,15 @@ def test_get_user(client, test_user_data):
     """Test get user by ID."""
     # Register user
     register_response = client.post("/api/users/register", json=test_user_data)
-    user_id = register_response.json()["id"]
+    reg_data = register_response.json()
+    user_id = reg_data["id"]
+    token = reg_data["access_token"]
     
     # Get user
-    response = client.get(f"/api/users/{user_id}")
+    response = client.get(
+        f"/api/users/{user_id}",
+        headers={"Authorization": f"Bearer {token}"}
+    )
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["id"] == user_id

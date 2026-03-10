@@ -166,17 +166,19 @@ async def register_user(user_data: UserRegister, db: Session = Depends(get_db)):
         )
     
     # Validate: Job seekers must provide university
-    if user_data.role == UserRole.JOB_SEEKER and not user_data.university:
+    if (user_data.role == UserRole.JOB_SEEKER or user_data.role == "student") and not user_data.university:
+        logger.warning(f"Registration failed: university missing for job seeker {user_data.email}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="University is required for job seekers"
+            detail="University is required for job seeker/student role"
         )
     
     # Validate: Startups must provide company name
-    if user_data.role == UserRole.STARTUP and not user_data.company_name:
+    if (user_data.role == UserRole.STARTUP or user_data.role == "founder") and not user_data.company_name:
+        logger.warning(f"Registration failed: company name missing for startup {user_data.email}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Company name is required for startups"
+            detail="Company name is required for startup/founder role"
         )
     
     # On-chain verification removed - not part of core solutions
@@ -207,6 +209,18 @@ async def register_user(user_data: UserRegister, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
     
+    # Generate access token for the newly registered user
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={
+            "sub": str(user.id),
+            "email": user.email,
+            "role": user.role.value,
+            "active_role": user.role.value,
+        },
+        expires_delta=access_token_expires
+    )
+
     logger.info(f"User registered: {user.id}, verified_on_chain: {verified_on_chain}")
     return {
         "id": user.id,
@@ -218,6 +232,7 @@ async def register_user(user_data: UserRegister, db: Session = Depends(get_db)):
         "company_name": user.company_name or "",
         "verified_on_chain": user.verified_on_chain or "pending",
         "created_at": user.created_at.isoformat() if user.created_at else None,
+        "access_token": access_token,
     }
 
 

@@ -8,9 +8,9 @@ from app.db.session import get_db
 from app.core.config import settings
 
 # Test database URL
-TEST_DATABASE_URL = "postgresql://test_user:test_pass@localhost:5432/trustbridge_test"
+TEST_DATABASE_URL = "sqlite:///./test.db"
 
-engine = create_engine(TEST_DATABASE_URL)
+engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -47,8 +47,9 @@ def test_user_data():
     return {
         "full_name": "Test User",
         "email": "test@example.com",
-        "password": "testpassword123",
+        "password": "TestPassword123!",
         "role": "student",
-        "wallet_address": "TestWallet123456789012345678901234567890"
+        "wallet_address": "TestWallet123456789012345678901234567890",
+        "university": "Test University"
     }
 

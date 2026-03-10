@@ -1,6 +1,6 @@
 import pytest
 from app.services.matching_service import MatchingService
-from app.db.models import User, Job, Startup, Certificate
+from app.db.models import User, Job, Startup
 from app.db.models.user import UserRole
 
 

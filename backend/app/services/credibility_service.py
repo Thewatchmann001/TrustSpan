@@ -285,7 +285,7 @@ class CredibilityService:
             return "B"
         elif score >= 50:
             return "C"
-        elif score >= 35:
+        elif score >= 40:
             return "D"
         else:
             return "F"

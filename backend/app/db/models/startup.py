@@ -50,11 +50,15 @@ class Startup(Base):
     milestones_completed = Column(Integer, default=0)  # Number of business milestones completed
     last_milestone_date = Column(DateTime, nullable=True)  # Date of last milestone
     
+    # Financials
+    withdrawable_balance = Column(Float, default=0.0)  # Total funds released by investors and ready for withdrawal
+
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
     founder = relationship("User", back_populates="startups")
     jobs = relationship("Job", back_populates="startup")
     investments = relationship("Investment", back_populates="startup")
+    withdrawal_requests = relationship("WithdrawalRequest", back_populates="startup", cascade="all, delete-orphan")
     employees = relationship("Employee", back_populates="startup", cascade="all, delete-orphan")
 
