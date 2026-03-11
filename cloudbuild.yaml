@@ -4,7 +4,11 @@ steps:
     args: ['build', '-t', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/backend:latest', './backend']
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-frontend'
-    args: ['build', '-t', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/frontend:latest', '--build-arg', 'NEXT_PUBLIC_API_URL=https://trustbridge-backend-406475861578.africa-south1.run.app', './frontend']
+    args: ['build', '-t', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/frontend:latest',
+           '--build-arg', 'NEXT_PUBLIC_API_URL=https://trustbridge-backend-406475861578.africa-south1.run.app',
+           '--build-arg', 'NEXT_PUBLIC_PRIVY_APP_ID=cmive70p0e6gu13kd2e4x1g1x',
+           '--build-arg', 'NEXT_PUBLIC_PRIVY_CLIENT_ID=client-WY6TQ3apwbdivAKHjNHBNxmWs8z2ZHJ3SqWwuD6G4pyVP',
+           './frontend']
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-backend'
     args: ['push', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/backend:latest']
@@ -14,7 +18,7 @@ steps:
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-backend'
     entrypoint: gcloud
-    args: ['run', 'deploy', 'trustbridge-backend', '--image=africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/backend:latest', '--region=africa-south1', '--platform=managed', '--allow-unauthenticated', '--port=8000', '--memory=512Mi', '--min-instances=1', '--max-instances=5']
+    args: ['run', 'deploy', 'trustbridge-backend', '--image=africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/backend:latest', '--region=africa-south1', '--platform=managed', '--allow-unauthenticated', '--port=8000', '--memory=2Gi', '--cpu=2', '--timeout=300', '--min-instances=1', '--max-instances=5']
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-frontend'
     entrypoint: gcloud
