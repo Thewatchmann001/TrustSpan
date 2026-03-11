@@ -1,11 +1,10 @@
 # TrustBridge Frontend — Next.js
 FROM node:20-alpine AS builder
-
 WORKDIR /app
+RUN apk add --no-cache python3 make g++ linux-headers eudev-dev
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps --ignore-scripts
 COPY . .
-# Build-time env (optional)
 ARG NEXT_PUBLIC_API_URL=http://localhost:8000
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN npm run build
