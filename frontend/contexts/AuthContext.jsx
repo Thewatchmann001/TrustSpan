@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
           console.log('🔄 Starting Privy user sync...');
           // Get Privy user data
           const privyUser = privyAuth.user;
-          const email = privyUser.email?.address || privyUser.linkedAccounts?.find(acc => acc.type === 'email')?.address;
+          let email = privyUser.email?.address || privyUser.linkedAccounts?.find(acc => acc.type === 'email')?.address;
           
           if (!email) {
             console.warn('⚠️ No email found in Privy user, using privy ID as fallback');
