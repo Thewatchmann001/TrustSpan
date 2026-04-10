@@ -30,19 +30,19 @@ export default function Home() {
       color: "from-sky-500 to-sky-600",
       gradient: "career-gradient",
     },
-    /* {
-      icon: TrendingUp,
-      title: "Invest in Verified Startups",
+    {
+      icon: Building2,
+      title: "Hire Top Talent",
       description:
-        "Blockchain-verified startups. Zero remittance fees. Transparent credibility scoring. Direct investment.",
+        "Access a pool of pre-vetted candidates. Use AI-powered search and ranking to find the perfect match for your team's needs.",
       color: "from-amber-500 to-amber-600",
-      gradient: "investment-gradient",
-    }, */
+      gradient: "employer-gradient",
+    },
     {
       icon: Shield,
       title: "Trust Through Technology",
       description:
-        "All credentials verified on Solana blockchain. Immutable trust signals. Transparent credibility.",
+        "All credentials verified on Solana blockchain. Immutable trust signals. Transparent credibility for both sides.",
       color: "from-sky-500 to-sky-600",
       gradient: "trust-gradient",
     },
@@ -50,7 +50,7 @@ export default function Home() {
       icon: Sparkles,
       title: "Smart Connections",
       description:
-        "AI-powered matching for jobs. Personalized recommendations. Data-driven decisions.",
+        "AI-powered matching for jobs and talent. Personalized recommendations. Data-driven decisions for candidates and employers.",
       color: "from-violet-500 to-violet-600",
       gradient: "career-gradient",
     },
@@ -76,20 +76,12 @@ export default function Home() {
     },
     {
       step: 2,
-      title: "Match & Apply",
-      description: "AI finds jobs → Apply with confidence → Track applications",
-      icon: Target,
-      image: "/images/backgrounds/how-it-works/step-2-match.jpg",
-      color: "from-violet-500 to-violet-600",
-    },
-    /* {
-      step: 3,
-      title: "Invest & Grow",
-      description: "Discover startups → Verify credibility → Invest with USDC",
-      icon: TrendingUp,
+      title: "Search & Hire",
+      description: "Post jobs → AI ranks candidates → Hire with verified trust",
+      icon: Users,
       image: "/images/backgrounds/how-it-works/step-3-invest.jpg",
-      color: "from-amber-500 to-sky-600",
-    }, */
+      color: "from-amber-500 to-amber-600",
+    },
   ];
 
   const stats = [
@@ -142,7 +134,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-xl md:text-2xl mb-10 text-white font-semibold leading-relaxed"
             >
-              Optimize your CV with AI and land your dream job with intelligent matching.
+              Optimize your career with AI. Intelligent matching for job seekers and top-tier talent discovery for employers.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -157,13 +149,13 @@ export default function Home() {
                 Start Building Your CV
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              {/* <Link
-                href="/investor-platform"
+              <Link
+                href="/employer-register"
                 className="btn-emerald inline-flex items-center gap-2 group"
               >
-                Explore Investments
-                <TrendingUp className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </Link> */}
+                Hire Top Talent
+                <Building2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              </Link>
             </motion.div>
           </motion.div>
         </div>
@@ -180,10 +172,10 @@ export default function Home() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              Your Career, Accelerated by AI
+              AI-Powered Career & Hiring Solutions
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Everything you need to build a professional CV and match with global opportunities.
+              Whether you're looking for your next career move or your next top hire, TrustBridge uses AI to bridge the gap.
             </p>
           </motion.div>
 
@@ -231,12 +223,12 @@ export default function Home() {
               How It Works
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              A simple process to transform your career.
+              A seamless experience for both job seekers and employers.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {steps.filter(s => s.step !== 3).map((item, index) => {
+            {steps.map((item, index) => {
               const Icon = item.icon;
               return (
                 <motion.div
@@ -359,20 +351,28 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl mb-10 text-slate-200 leading-relaxed"
           >
-            Join thousands building successful careers.
+            Join thousands of professionals and employers building the future of work.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Link
               href="/register"
               className="btn-cta inline-flex items-center gap-2 group"
             >
-              Get Started Free
+              Join as Job Seeker
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="/employer-register"
+              className="btn-white inline-flex items-center gap-2 group"
+            >
+              Join as Employer
+              <Building2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </Link>
           </motion.div>
         </div>
