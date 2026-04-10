@@ -33,7 +33,7 @@ from routes import router as main_router  # New consolidated routes
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="AI-Powered CV Builder & Global Job Matching + Diaspora Investment Platform",
+    description="AI-Powered Professional Career & Investment Platform",
     docs_url="/docs",
     redoc_url="/redoc"
 )

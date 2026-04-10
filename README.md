@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**AI-Powered Career Development & Diaspora Investment Platform**
+**AI-Powered Career Development & Investment Platform**
 
 _Connecting Talent with Opportunity | Empowering Global Investments_
 
@@ -42,7 +42,7 @@ _Connecting Talent with Opportunity | Empowering Global Investments_
 
 ## 🎯 Overview
 
-**TrustBridge** is an enterprise-grade platform that revolutionizes career development and diaspora investment through AI-powered technology, blockchain verification, and global market integration.
+**TrustBridge** is an enterprise-grade platform that revolutionizes career development and investment through AI-powered technology, blockchain verification, and global market integration.
 
 ### Key Capabilities
 

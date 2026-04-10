@@ -152,7 +152,7 @@ export default function InvestorPlatformPage() {
         <div className="max-w-7xl mx-auto px-6 py-12 h-full flex items-end">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
-              Diaspora Investment Platform
+              Professional Investment Platform
             </h1>
             <p className="text-xl text-white font-semibold max-w-3xl">
               Invest in verified startups. Zero fees. Full transparency. Blockchain-verified credibility.

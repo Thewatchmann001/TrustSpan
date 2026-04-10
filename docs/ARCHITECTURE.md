@@ -5,7 +5,7 @@
 This platform consists of two main solutions:
 
 1. **AI-Powered CV Builder + Global Job Matching**
-2. **Diaspora Investment Platform Using Stablecoins**
+2. **Professional Investment Platform Using Stablecoins**
 
 ## System Architecture
 
