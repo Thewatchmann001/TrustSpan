@@ -1,382 +1,461 @@
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
-  Award,
-  Building2,
-  TrendingUp,
-  Shield,
-  Users,
-  Zap,
-  ArrowRight,
-  CheckCircle,
-  Briefcase,
-  Sparkles,
-  FileText,
-  Globe,
-  BarChart3,
-  Target,
+  Briefcase, Shield, Sparkles, Building2, Users, FileText,
+  CheckCircle, Globe, ArrowRight, Menu, X, Star, Zap, Lock
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/Logo";
-import BackgroundImage from "../components/BackgroundImage";
+import { authAPI } from "../lib/api";
 
 export default function Home() {
-  const features = [
-    {
-      icon: Briefcase,
-      title: "Land Your Dream Job",
-      description:
-        "ATS-optimized CVs that pass through applicant tracking systems. AI-powered job matching connects you with global opportunities.",
-      color: "from-sky-500 to-sky-600",
-      gradient: "career-gradient",
-    },
-    {
-      icon: Building2,
-      title: "Hire Top Talent",
-      description:
-        "Access a pool of pre-vetted candidates. Use AI-powered search and ranking to find the perfect match for your team's needs.",
-      color: "from-amber-500 to-amber-600",
-      gradient: "employer-gradient",
-    },
-    {
-      icon: Shield,
-      title: "Trust Through Technology",
-      description:
-        "All credentials verified on Solana blockchain. Immutable trust signals. Transparent credibility for both sides.",
-      color: "from-sky-500 to-sky-600",
-      gradient: "trust-gradient",
-    },
-    {
-      icon: Sparkles,
-      title: "Smart Connections",
-      description:
-        "AI-powered matching for jobs and talent. Personalized recommendations. Data-driven decisions for candidates and employers.",
-      color: "from-violet-500 to-violet-600",
-      gradient: "career-gradient",
-    },
-  ];
+  const [stats, setStats] = useState(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const benefits = [
-    /* "Zero remittance fees with USDC stablecoins",
-    "Currency risk eliminated",
-    "Transparent credibility scoring", */
-    "Blockchain-verified credentials",
-    "AI-powered job matching",
-    /* "Direct investment", */
-  ];
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/public-stats`);
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+      } finally {
+        setLoadingStats(false);
+      }
+    }
+    fetchStats();
+  }, []);
 
-  const steps = [
-    {
-      step: 1,
-      title: "Build & Optimize",
-      description: "Upload CV → AI optimizes → ATS score improves",
-      icon: FileText,
-      image: "/images/backgrounds/how-it-works/step-1-build.jpg",
-      color: "from-sky-500 to-sky-600",
-    },
-    {
-      step: 2,
-      title: "Search & Hire",
-      description: "Post jobs → AI ranks candidates → Hire with verified trust",
-      icon: Users,
-      image: "/images/backgrounds/how-it-works/step-3-invest.jpg",
-      color: "from-amber-500 to-amber-600",
-    },
-  ];
-
-  const stats = [
-    { value: "90%+", label: "ATS Score Improvement", icon: BarChart3 },
-    /* { value: "Zero", label: "Remittance Fees", icon: Shield }, */
-    { value: "100%", label: "Blockchain Verified", icon: CheckCircle },
-    { value: "Global", label: "Job Opportunities", icon: Globe },
+  const navLinks = [
+    { name: "Home", href: "#" },
+    { name: "For Job Seekers", href: "/register" },
+    { name: "For Employers", href: "/employer-register" },
+    { name: "About", href: "#" },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#0A1628] text-white font-['Inter'] selection:bg-[#1EB53A]/30">
+      {/* Navbar */}
+      <nav className="fixed top-0 w-full z-50 bg-[#0A1628]/95 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Logo size="default" showText={true} variant="light" />
+          </div>
+
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                className="text-sm font-medium text-slate-300 hover:text-[#1EB53A] transition-colors"
+              >
+                {link.name}
+              </a>
+            ))}
+          </div>
+
+          <div className="hidden md:flex items-center gap-4">
+            <Link href="/login" className="px-6 py-2 text-sm font-semibold text-white hover:text-[#1EB53A] transition-colors">
+              Sign In
+            </Link>
+            <Link href="/register" className="px-6 py-2 text-sm font-bold bg-[#1EB53A] hover:bg-[#199a31] rounded-lg transition-all transform hover:scale-105 active:scale-95">
+              Get Started
+            </Link>
+          </div>
+
+          <button className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-[#0E2040] border-b border-white/10 overflow-hidden"
+            >
+              <div className="flex flex-col p-6 gap-4">
+                {navLinks.map((link) => (
+                  <a key={link.name} href={link.href} className="text-lg font-medium text-slate-300">{link.name}</a>
+                ))}
+                <div className="pt-4 flex flex-col gap-4 border-t border-white/10">
+                  <Link href="/login" className="text-center font-semibold">Sign In</Link>
+                  <Link href="/register" className="btn-cta text-center py-3 bg-[#1EB53A]">Get Started</Link>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+
       {/* Hero Section */}
-      <BackgroundImage
-        src="/images/backgrounds/hero/landing-hero.jpg"
-        alt="Professional workspace - TrustBridge"
-        overlay="default"
-        className="min-h-screen"
-        priority={true}
-      >
-        <div className="max-w-7xl mx-auto px-6 py-24 md:py-32">
-          {/* Logo */}
+      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        {/* Abstract Background */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#1EB53A]/5 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            <div className="flex justify-center">
-              <Logo size="large" showText={true} variant="light" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1EB53A]/10 border border-[#1EB53A]/20 text-[#1EB53A] text-xs font-bold mb-8 uppercase tracking-wider">
+              <span className="text-lg">🇸🇱</span> Sierra Leone's #1 Career Platform
+            </div>
+
+            <h1 className="text-6xl md:text-8xl font-[800] leading-[1.1] mb-8">
+              Build a Career<br />
+              <span className="text-[#1EB53A]">Worth Trusting</span>
+            </h1>
+
+            <p className="text-xl text-slate-400 mb-10 max-w-lg leading-relaxed font-normal">
+              AI-powered CV builder, blockchain credentials, and direct employer connections — built for Sierra Leone's next generation.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+              <Link href="/cv-builder" className="px-8 py-4 bg-[#1EB53A] hover:bg-[#199a31] text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1">
+                Build My CV <ArrowRight size={20} />
+              </Link>
+              <Link href="/employer-register" className="px-8 py-4 border border-white/10 hover:bg-white/5 text-white rounded-lg font-bold flex items-center justify-center transition-all">
+                For Employers
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap gap-6">
+              {[
+                { icon: Lock, text: "Blockchain Verified" },
+                { icon: Sparkles, text: "Mistral AI Powered" },
+                { icon: Zap, text: "Solana Network" }
+              ].map((badge, i) => (
+                <div key={i} className="flex items-center gap-2 text-slate-500 text-sm font-medium">
+                  <badge.icon size={16} className="text-[#1EB53A]" />
+                  {badge.text}
+                </div>
+              ))}
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-4xl mx-auto"
-          >
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-white"
-            >
-              Bridge Your Career To Success
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-xl md:text-2xl mb-10 text-white font-semibold leading-relaxed"
-            >
-              Optimize your career with AI. Intelligent matching for job seekers and top-tier talent discovery for employers.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-            >
-              <Link
-                href="/cv-builder"
-                className="btn-cta inline-flex items-center gap-2 group"
-              >
-                Start Building Your CV
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                href="/employer-register"
-                className="btn-emerald inline-flex items-center gap-2 group"
-              >
-                Hire Top Talent
-                <Building2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </Link>
-            </motion.div>
-          </motion.div>
-        </div>
-      </BackgroundImage>
-
-      {/* Value Proposition Section */}
-      <div className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              AI-Powered Career & Hiring Solutions
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Whether you're looking for your next career move or your next top hire, TrustBridge uses AI to bridge the gap.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="card-feature group"
-                >
-                  <div
-                    className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300`}
-                  >
-                    <Icon className="w-10 h-10 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* How It Works Section */}
-      <div className="py-24 bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              How It Works
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              A seamless experience for both job seekers and employers.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {steps.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.2 }}
-                  className="relative"
-                >
-                  <div className="card text-center">
-                    {/* Step Number */}
-                    <div
-                      className={`absolute -top-6 left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} text-white flex items-center justify-center text-3xl font-bold shadow-xl`}
-                    >
-                      {item.step}
-                    </div>
-
-                    {/* Illustration Image */}
-                    <div className="relative w-full h-48 rounded-xl overflow-hidden mb-6 mt-8">
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        fill
-                        className="object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-
-                    {/* Icon */}
-                    <div
-                      className={`w-16 h-16 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}
-                    >
-                      <Icon className="w-8 h-8 text-white" />
-                    </div>
-
-                    <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                      {item.title}
-                    </h3>
-                    <p className="text-slate-600 leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Section */}
-      <div className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              TrustBridge by the Numbers
-            </h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="text-center"
-                >
-                  <div className="card-premium">
-                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-500 to-sky-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                      <Icon className="w-8 h-8 text-white" />
-                    </div>
-                    <div className="text-5xl font-bold text-slate-900 mb-2">
-                      {stat.value}
-                    </div>
-                    <div className="text-slate-600 font-medium">
-                      {stat.label}
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Final CTA Section */}
-      <div className="relative py-24 overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: 'url(/images/backgrounds/features/investment-feature.jpg)',
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-slate-800/85 to-amber-500/40" />
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-4xl md:text-5xl font-bold mb-6 text-white"
-          >
-            Ready to Bridge Your Future?
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl mb-10 text-slate-200 leading-relaxed"
+            className="hidden lg:block relative"
           >
-            Join thousands of professionals and employers building the future of work.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <Link
-              href="/register"
-              className="btn-cta inline-flex items-center gap-2 group"
-            >
-              Join as Job Seeker
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="/employer-register"
-              className="btn-white inline-flex items-center gap-2 group"
-            >
-              Join as Employer
-              <Building2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            </Link>
+            <div className="relative z-10 bg-[#0E2040] border border-white/10 rounded-2xl p-8 shadow-2xl">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-slate-700 animate-pulse" />
+                  <div>
+                    <div className="w-32 h-4 bg-slate-700 rounded mb-2 animate-pulse" />
+                    <div className="w-24 h-3 bg-slate-800 rounded animate-pulse" />
+                  </div>
+                </div>
+                <div className="px-3 py-1 bg-[#1EB53A]/20 text-[#1EB53A] rounded-full text-xs font-bold">
+                  ATS Score: 98
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: "98%" }}
+                      transition={{ duration: 1.5, delay: 1 }}
+                      className="h-full bg-[#1EB53A]"
+                    />
+                  </div>
+                  <div className="flex justify-between mt-2">
+                    <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">AI Optimization Progress</span>
+                    <span className="text-[10px] text-[#1EB53A] font-bold">Complete</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="h-4 bg-white/5 rounded w-3/4" />
+                  <div className="h-4 bg-white/5 rounded w-full" />
+                  <div className="h-4 bg-white/5 rounded w-1/2" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                  <div className="h-20 bg-white/5 rounded-xl border border-white/5 flex items-center justify-center">
+                    <Sparkles className="text-violet-400" />
+                  </div>
+                  <div className="h-20 bg-white/5 rounded-xl border border-white/5 flex items-center justify-center">
+                    <Shield className="text-[#1EB53A]" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Background Decor */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#1EB53A]/10 rounded-full blur-3xl" />
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gold/5 rounded-full blur-3xl" />
           </motion.div>
         </div>
-      </div>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="py-12 bg-[#0E2040] border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-8">
+          {[
+            { label: "Total Users", key: "total_users" },
+            { label: "CVs Created", key: "total_cvs" },
+            { label: "Employers", key: "total_employers" },
+            { label: "Verified Credentials", key: "verified_credentials" }
+          ].map((stat, i) => (
+            <div key={i} className="text-center md:text-left">
+              <p className="text-slate-500 text-sm font-semibold uppercase tracking-wider mb-2">{stat.label}</p>
+              {loadingStats ? (
+                <div className="h-10 w-24 bg-white/5 rounded animate-pulse" />
+              ) : (
+                <p className="text-4xl font-bold">{stats?.[stat.key]?.toLocaleString() || '0'}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-24 bg-[#0A1628]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <span className="text-[#1EB53A] text-xs font-bold uppercase tracking-[0.2em] mb-4 block">Platform Features</span>
+            <h2 className="text-4xl md:text-5xl font-extrabold">One Platform. Every Career Tool.</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: FileText,
+                title: "CV Builder",
+                desc: "Build ATS-optimized CVs in minutes with AI assistance. Upload existing CV for instant parsing."
+              },
+              {
+                icon: Sparkles,
+                title: "AI Job Matching",
+                desc: "AI matches your profile to verified employer openings across Sierra Leone and beyond."
+              },
+              {
+                icon: Shield,
+                title: "Blockchain Credentials",
+                desc: "Every certificate and work history verified on Solana. Unforgeable. Portable. Trusted."
+              }
+            ].map((f, i) => (
+              <div key={i} className="bg-[#0E2040] p-8 rounded-xl border border-white/5 border-l-4 border-l-[#1EB53A] group hover:bg-[#122850] transition-all">
+                <div className="w-12 h-12 rounded-full bg-[#1EB53A]/10 flex items-center justify-center text-[#1EB53A] mb-6 group-hover:scale-110 transition-transform">
+                  <f.icon size={24} />
+                </div>
+                <h3 className="text-xl font-bold mb-4">{f.title}</h3>
+                <p className="text-slate-400 leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-24 bg-[#0E2040]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-4">How It Works</h2>
+            <p className="text-slate-400">A simple process to elevate your career status.</p>
+          </div>
+
+          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-12">
+            {/* Desktop Connector Line */}
+            <div className="hidden md:block absolute top-[60px] left-[15%] right-[15%] h-[2px] bg-white/5" />
+
+            {[
+              { step: "01", title: "Create Your Profile", desc: "Register and complete your professional profile" },
+              { step: "02", title: "Build & Optimize", desc: "Use our AI CV builder or upload your existing CV" },
+              { step: "03", title: "Get Matched", desc: "Employers find you. You find opportunities. Everyone wins." }
+            ].map((s, i) => (
+              <div key={i} className="relative text-center z-10">
+                <div className="text-5xl font-black text-[#1EB53A] mb-8 drop-shadow-[0_0_15px_rgba(30,181,58,0.3)]">{s.step}</div>
+                <h3 className="text-xl font-bold mb-4">{s.title}</h3>
+                <p className="text-slate-400 max-w-[250px] mx-auto">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* For Employers Section */}
+      <section className="py-24 bg-[#0A1628]">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <span className="text-[#F4A31A] text-xs font-bold uppercase tracking-[0.2em] mb-4 block">For Hiring Managers</span>
+            <h2 className="text-4xl md:text-6xl font-extrabold mb-8">Find Sierra Leone's<br />Best Talent</h2>
+            <p className="text-lg text-slate-400 mb-10 leading-relaxed">
+              Post your hiring criteria. Our AI searches thousands of verified CVs and ranks candidates by fit score. No more guesswork.
+            </p>
+            <Link href="/employer-register" className="px-8 py-4 bg-[#F4A31A] hover:bg-[#d98c0d] text-[#0A1628] rounded-lg font-bold flex items-center justify-center sm:inline-flex gap-2 transition-all transform hover:-translate-y-1">
+              Register as Employer <ArrowRight size={20} />
+            </Link>
+          </div>
+
+          <div className="bg-[#0E2040] rounded-2xl border border-white/10 p-6 shadow-2xl relative overflow-hidden">
+            <div className="flex items-center justify-between mb-8">
+              <div className="text-sm font-bold uppercase tracking-wider text-slate-500">Candidate Search Results</div>
+              <div className="flex gap-1">
+                <div className="w-2 h-2 rounded-full bg-red-500" />
+                <div className="w-2 h-2 rounded-full bg-amber-500" />
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {[
+                { name: "Musa Kamara", role: "Sr. Software Engineer", score: 96 },
+                { name: "Fatu Bangura", role: "Product Designer", score: 92 },
+                { name: "Ibrahim Sesay", role: "Data Analyst", score: 89 }
+              ].map((c, i) => (
+                <div key={i} className="p-4 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-slate-700" />
+                    <div>
+                      <div className="text-sm font-bold">{c.name}</div>
+                      <div className="text-[10px] text-slate-500">{c.role}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-bold text-[#1EB53A]">{c.score}%</div>
+                    <div className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Match Score</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-24 bg-[#0E2040]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-4">Success Stories</h2>
+            <p className="text-slate-400">Trusted by professionals across Freetown and beyond.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Alpha Jalloh",
+                role: "Software Developer",
+                company: "TechSalone",
+                quote: "TrustBridge's AI CV builder helped me restructure my experience. I landed a senior role within two weeks of applying."
+              },
+              {
+                name: "Zainab Conteh",
+                role: "HR Manager",
+                company: "Freetown Logistics",
+                quote: "The candidate vetting is unmatched. We saved 40+ hours on our last hiring cycle thanks to the match scores."
+              },
+              {
+                name: "Samuel Kargbo",
+                role: "Operations Lead",
+                company: "Sierra Mining",
+                quote: "Blockchain verification gives me peace of mind. Knowing every degree is verified makes hiring a breeze."
+              }
+            ].map((t, i) => (
+              <div key={i} className="bg-[#122850] p-8 rounded-xl border border-white/5 shadow-xl">
+                <div className="flex gap-1 text-[#F4A31A] mb-6">
+                  {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                </div>
+                <p className="text-slate-300 italic mb-8 leading-relaxed">"{t.quote}"</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-slate-700" />
+                  <div>
+                    <div className="font-bold">{t.name}</div>
+                    <div className="text-xs text-slate-500">{t.role} @ {t.company}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-24 px-6">
+        <div className="max-w-5xl mx-auto rounded-3xl overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0D7C6E] to-[#0A1628]" />
+          <div className="relative z-10 p-12 md:p-24 text-center">
+            <h2 className="text-4xl md:text-6xl font-black mb-8 leading-tight">Ready to Build<br />Your Future?</h2>
+            <p className="text-xl text-white/70 mb-12 max-w-lg mx-auto leading-relaxed">
+              Join Sierra Leone's fastest growing career platform. Free to start.
+            </p>
+            <Link href="/register" className="px-10 py-5 bg-[#1EB53A] hover:bg-[#199a31] text-white rounded-xl font-[800] text-xl transition-all transform hover:-translate-y-1 shadow-2xl">
+              Get Started Free <ArrowRight className="inline-block ml-2" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="pt-24 pb-12 bg-[#060D1A] border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+          <div className="col-span-2 lg:col-span-1">
+            <Logo size="default" showText={true} variant="light" className="mb-6" />
+            <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+              Elevating Sierra Leone's professional landscape through AI and blockchain technology.
+            </p>
+            <div className="flex gap-4">
+              {['twitter', 'linkedin', 'facebook'].map(s => (
+                <div key={s} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#1EB53A] transition-colors cursor-pointer">
+                  <Globe size={16} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-bold mb-6">Job Seekers</h4>
+            <ul className="space-y-4 text-sm text-slate-500">
+              <li><Link href="/cv-builder" className="hover:text-[#1EB53A]">AI CV Builder</Link></li>
+              <li><Link href="/register" className="hover:text-[#1EB53A]">Find Jobs</Link></li>
+              <li><Link href="#" className="hover:text-[#1EB53A]">Career Advice</Link></li>
+              <li><Link href="#" className="hover:text-[#1EB53A]">ATS Scoring</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-bold mb-6">Employers</h4>
+            <ul className="space-y-4 text-sm text-slate-500">
+              <li><Link href="/employer-register" className="hover:text-[#1EB53A]">Post a Job</Link></li>
+              <li><Link href="/employer-register" className="hover:text-[#1EB53A]">Browse Talent</Link></li>
+              <li><Link href="#" className="hover:text-[#1EB53A]">AI Ranking</Link></li>
+              <li><Link href="#" className="hover:text-[#1EB53A]">Enterprise</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-bold mb-6">Company</h4>
+            <ul className="space-y-4 text-sm text-slate-500">
+              <li><Link href="#" className="hover:text-[#1EB53A]">About Us</Link></li>
+              <li><Link href="#" className="hover:text-[#1EB53A]">Contact</Link></li>
+              <li><Link href="#" className="hover:text-[#1EB53A]">Privacy Policy</Link></li>
+              <li><Link href="#" className="hover:text-[#1EB53A]">Terms of Service</Link></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-white/5 flex flex-col md:row items-center justify-between gap-4">
+          <p className="text-xs text-slate-500">© 2026 TrustBridge Sierra Leone. Built with ❤️ in Freetown.</p>
+          <div className="flex gap-6 text-xs text-slate-500">
+            <span>#1 in Career Trust</span>
+            <span>Solana Native</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -49,22 +49,20 @@
 - ✅ Added new endpoint `/api/cv/match-jobs-v2`
 - ✅ All components integrated and working
 
-## 🔄 IN PROGRESS
-
 ### Part 6: UI Improvements
-- ⏳ Update frontend to use new endpoint
-- ⏳ Show job source badges
-- ⏳ Show match percentage
-- ⏳ Show match reasons
-- ⏳ Show fallback explanations
+- ✅ Update frontend to use new endpoint
+- ✅ Show job source badges
+- ✅ Show match percentage
+- ✅ Show match reasons
+- ✅ Show fallback explanations
 
 ## 📋 TODO
 
 1. **Update Frontend Components**:
-   - Update `JobList.jsx` to call `/api/cv/match-jobs-v2`
-   - Display match scores and reasons
-   - Show source badges
-   - Show fallback indicators
+   - ✅ Update `JobList.jsx` to call `/api/cv/match-jobs-v2`
+   - ✅ Display match scores and reasons
+   - ✅ Show source badges
+   - ✅ Show fallback indicators
 
 2. **Install Dependencies**:
    - Add `sentence-transformers` to requirements.txt
