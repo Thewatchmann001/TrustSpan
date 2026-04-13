@@ -50,7 +50,7 @@ test_cv = {
             "description": "Built system managing 200+ SKUs with barcode scanning reducing data entry by 60%"
         },
         {
-            "name": "TrustBridge",
+            "name": "TrustSpan",
             "description": "AI-powered CV optimization and blockchain investment platform"
         }
     ],

@@ -1,34 +1,34 @@
 """
-Custom exceptions for TrustBridge backend
+Custom exceptions for TrustSpan backend
 """
 
 
-class TrustBridgeException(Exception):
-    """Base exception for TrustBridge application."""
+class TrustSpanException(Exception):
+    """Base exception for TrustSpan application."""
     pass
 
 
-class BlockchainError(TrustBridgeException):
+class BlockchainError(TrustSpanException):
     """Exception raised for blockchain-related errors."""
     pass
 
 
-class AIServiceError(TrustBridgeException):
+class AIServiceError(TrustSpanException):
     """Exception raised for AI service errors."""
     pass
 
 
-class ValidationError(TrustBridgeException):
+class ValidationError(TrustSpanException):
     """Exception raised for validation errors."""
     pass
 
 
-class AuthenticationError(TrustBridgeException):
+class AuthenticationError(TrustSpanException):
     """Exception raised for authentication errors."""
     pass
 
 
-class AuthorizationError(TrustBridgeException):
+class AuthorizationError(TrustSpanException):
     """Exception raised for authorization errors."""
     pass
 
@@ -38,6 +38,6 @@ class InvalidCredentials(AuthenticationError):
     pass
 
 
-class UserNotFound(TrustBridgeException):
+class UserNotFound(TrustSpanException):
     """Exception raised when user is not found."""
     pass

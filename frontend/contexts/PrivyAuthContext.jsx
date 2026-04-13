@@ -6,7 +6,7 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { usePrivy } from "@privy-io/react-auth";
 
-const PENDING_ROLE_STORAGE_KEY = "trustbridge_pending_role";
+const PENDING_ROLE_STORAGE_KEY = "trustspan_pending_role";
 
 const PRIVY_ENABLED = typeof window !== 'undefined' && 
   process.env.NEXT_PUBLIC_PRIVY_APP_ID && 

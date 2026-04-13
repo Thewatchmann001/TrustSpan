@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# TrustBridge SL - Environment Setup Script
+# TrustSpan SL - Environment Setup Script
 # This script helps set up the development environment
 
-echo "🚀 TrustBridge SL - Blockchain Setup"
+echo "🚀 TrustSpan SL - Blockchain Setup"
 echo "========================================"
 
 # Check if .env exists

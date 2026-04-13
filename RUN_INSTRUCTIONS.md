@@ -1,4 +1,4 @@
-# 🚀 How to Run TrustBridge
+# 🚀 How to Run TrustSpan
 
 ## ✅ Setup Complete!
 
@@ -101,7 +101,7 @@ So **Stripe is 100% incorporated**: with only `STRIPE_SECRET_KEY` set, card paym
 - ✅ Python 3.12.3 installed
 - ✅ Virtual environment created at `backend/venv`
 - ✅ All dependencies installed (including httpx>=0.28.0, solana, qrcode, mistralai)
-- ✅ Database configured: `postgresql://trustbridge:trustbridge@localhost:5432/trustbridgedb`
+- ✅ Database configured: `postgresql://trustspan:trustspan@localhost:5432/trustspandb`
 - ✅ Mistral AI API key configured
 - ✅ .env files created
 
@@ -128,9 +128,9 @@ sudo systemctl start postgresql
 sudo -u postgres psql
 
 # Create database and user
-CREATE DATABASE trustbridgedb;
-CREATE USER trustbridge WITH PASSWORD 'trustbridge';
-GRANT ALL PRIVILEGES ON DATABASE trustbridgedb TO trustbridge;
+CREATE DATABASE trustspandb;
+CREATE USER trustspan WITH PASSWORD 'trustspan';
+GRANT ALL PRIVILEGES ON DATABASE trustspandb TO trustspan;
 \q
 ```
 
@@ -249,7 +249,7 @@ All configuration is in:
 ### Key Variables:
 
 **Backend (.env):**
-- `DATABASE_URL=postgresql://trustbridge:trustbridge@localhost:5432/trustbridgedb`
+- `DATABASE_URL=postgresql://trustspan:trustspan@localhost:5432/trustspandb`
 - `MISTRAL_API_KEY=your_mistral_api_key_here` (Get from https://mistral.ai/)
 - `STRIPE_SECRET_KEY=sk_test_...` (optional — for card payments: https://dashboard.stripe.com/apikeys)
 - `STRIPE_WEBHOOK_SECRET=whsec_...` (optional — for Stripe webhook: add endpoint `POST /api/payments/webhook`, event `checkout.session.completed`)
@@ -271,10 +271,10 @@ All configuration is in:
 sudo systemctl status postgresql
 
 # Check if database exists
-sudo -u postgres psql -l | grep trustbridgedb
+sudo -u postgres psql -l | grep trustspandb
 
 # Test connection
-psql -U trustbridge -d trustbridgedb -h localhost
+psql -U trustspan -d trustspandb -h localhost
 ```
 
 ### Issue: Port Already in Use

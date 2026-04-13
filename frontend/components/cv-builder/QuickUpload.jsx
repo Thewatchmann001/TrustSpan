@@ -501,7 +501,7 @@ export default function QuickUpload({ onComplete, onCancel }) {
               <ul className="space-y-1 text-blue-800">
                 <li>• AI extracts your personal info, experience, education & skills</li>
                 <li>• Automatically matches you to relevant jobs</li>
-                <li>• Creates your TrustBridge profile instantly</li>
+                <li>• Creates your TrustSpan profile instantly</li>
                 <li>• Takes only 5-10 seconds!</li>
               </ul>
             </div>

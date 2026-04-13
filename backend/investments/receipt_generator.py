@@ -196,7 +196,7 @@ class ReceiptGenerator:
             
             # Footer
             footer_text = (
-                "This receipt serves as proof of your investment transaction on the TrustBridge platform. "
+                "This receipt serves as proof of your investment transaction on the TrustSpan platform. "
                 "All transactions are recorded on the Solana blockchain for transparency and verification. "
                 "Please keep this receipt for your records."
             )

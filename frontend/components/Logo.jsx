@@ -36,7 +36,7 @@ export default function Logo({ size = 'default', showText = true, className = ''
         {hasLogoImage ? (
           <Image
             src="/trust.png"
-            alt="TrustBridge Logo"
+            alt="TrustSpan Logo"
             width={size === 'small' ? 32 : size === 'default' ? 48 : 64}
             height={size === 'small' ? 32 : size === 'default' ? 48 : 64}
             className="object-contain"
@@ -56,11 +56,11 @@ export default function Logo({ size = 'default', showText = true, className = ''
         )}
       </div>
       
-      {/* TrustBridge Text - Always Visible */}
+      {/* TrustSpan Text - Always Visible */}
       {showText && (
         <div className="flex flex-col justify-center">
           <span className={`${sizeConfig.text} font-extrabold ${textClasses.main} transition-all duration-300 leading-tight tracking-tight whitespace-nowrap drop-shadow-lg`}>
-            TrustBridge
+            TrustSpan
           </span>
           <span className={`${sizeConfig.subtext} ${textClasses.sub} font-semibold -mt-0.5 leading-tight whitespace-nowrap`}>
             Sierra Leone

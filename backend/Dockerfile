@@ -1,4 +1,4 @@
-# TrustBridge Backend — Python 3.12
+# TrustSpan Backend — Python 3.12
 FROM python:3.12-slim
 
 WORKDIR /app

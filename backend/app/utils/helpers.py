@@ -1,5 +1,5 @@
 """
-Helper functions for TrustBridge backend
+Helper functions for TrustSpan backend
 """
 from typing import Dict, Any, Optional
 import json

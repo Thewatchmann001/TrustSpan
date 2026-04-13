@@ -22,7 +22,7 @@ from app.api.cv import router as cv_router
 from app.api.employers import router as employers_router
 from app.api.admin import router as admin_router
 from app.api.websocket import manager
-from app.core.exceptions import InvalidCredentials, UserNotFound, TrustBridgeException
+from app.core.exceptions import InvalidCredentials, UserNotFound, TrustSpanException
 from app.core.middleware import RateLimitMiddleware, CSRFProtectionMiddleware
 from routes import router as main_router  # New consolidated routes
 
@@ -95,9 +95,9 @@ async def user_not_found_handler(request: Request, exc: UserNotFound):
     )
 
 
-@app.exception_handler(TrustBridgeException)
-async def trustbridge_exception_handler(request: Request, exc: TrustBridgeException):
-    """Handle general TrustBridge exceptions."""
+@app.exception_handler(TrustSpanException)
+async def trustspan_exception_handler(request: Request, exc: TrustSpanException):
+    """Handle general TrustSpan exceptions."""
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"detail": str(exc)}
@@ -108,7 +108,7 @@ async def trustbridge_exception_handler(request: Request, exc: TrustBridgeExcept
 async def root():
     """Root endpoint."""
     return {
-        "message": "TrustBridge API",
+        "message": "TrustSpan API",
         "version": settings.APP_VERSION,
         "docs": "/docs"
     }
@@ -168,5 +168,5 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     """Shutdown event handler."""
-    logger.info("Shutting down TrustBridge API")
+    logger.info("Shutting down TrustSpan API")
 

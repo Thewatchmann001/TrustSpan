@@ -31,7 +31,7 @@ class RemoteOKProvider(BaseJobProvider):
             start_time = datetime.now()
             
             headers = {
-                'User-Agent': 'TrustBridge Job Aggregator (https://trustbridge.sl)'
+                'User-Agent': 'TrustSpan Job Aggregator (https://trustspan.sl)'
             }
             
             # Use requests in async context (can be improved with aiohttp later)

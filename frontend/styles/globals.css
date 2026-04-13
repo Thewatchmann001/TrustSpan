@@ -60,7 +60,7 @@
     box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
   }
   
-  /* Premium Buttons - TrustBridge Design System */
+  /* Premium Buttons - TrustSpan Design System */
   .btn-primary {
     @apply bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-3 rounded-lg font-semibold
            shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0
@@ -116,7 +116,7 @@
            shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300;
   }
   
-  /* Premium Cards - TrustBridge Design System */
+  /* Premium Cards - TrustSpan Design System */
   .card {
     @apply bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl
            transform hover:-translate-y-2 transition-all duration-300
@@ -145,7 +145,7 @@
     @apply card;
   }
   
-  /* Premium Input - TrustBridge Design System */
+  /* Premium Input - TrustSpan Design System */
   .input-field {
     @apply w-full px-4 py-3 rounded-lg border-2 border-slate-200 
            focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 
@@ -184,7 +184,7 @@
            bg-gradient-to-r from-sky-500 to-sky-600 text-white shadow-lg;
   }
   
-  /* Premium Gradients - TrustBridge Design System */
+  /* Premium Gradients - TrustSpan Design System */
   .premium-gradient {
     @apply bg-gradient-to-br from-slate-900 via-slate-800 to-amber-500;
   }

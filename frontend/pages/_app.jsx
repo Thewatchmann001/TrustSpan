@@ -116,7 +116,7 @@ function MyApp({ Component, pageProps }) {
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f4f8' }}>
         <div style={{ textAlign: 'center' }}>
           <div className="animate-spin" style={{ width: 40, height: 40, border: '3px solid #ddd', borderTop: '3px solid #0A66C2', borderRadius: '50%', margin: '0 auto' }}></div>
-          <p style={{ marginTop: 16, color: '#666' }}>Loading TrustBridge...</p>
+          <p style={{ marginTop: 16, color: '#666' }}>Loading TrustSpan...</p>
         </div>
       </div>
     );
@@ -148,7 +148,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>TrustBridge - Professional Career & Investment Platform</title>
+        <title>TrustSpan - Professional Career & Investment Platform</title>
         <meta
           name="description"
           content="AI-Powered CV Builder & Global Job Matching Platform"
@@ -164,7 +164,7 @@ function MyApp({ Component, pageProps }) {
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="TrustBridge" />
+        <meta name="apple-mobile-web-app-title" content="TrustSpan" />
 
         {/* iOS Safari */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -180,17 +180,17 @@ function MyApp({ Component, pageProps }) {
         <meta property="og:type" content="website" />
         <meta
           property="og:title"
-          content="TrustBridge - Professional Career & Investment Platform"
+          content="TrustSpan - Professional Career & Investment Platform"
         />
         <meta
           property="og:description"
           content="AI-Powered CV Builder & Global Job Matching Platform"
         />
-        <meta property="og:site_name" content="TrustBridge" />
+        <meta property="og:site_name" content="TrustSpan" />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="TrustBridge" />
+        <meta name="twitter:title" content="TrustSpan" />
         <meta
           name="twitter:description"
           content="AI-Powered CV Builder & Global Job Matching Platform"

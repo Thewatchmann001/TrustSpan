@@ -31,7 +31,7 @@ class ArbeitnowProvider(BaseJobProvider):
             start_time = datetime.now()
             
             headers = {
-                'User-Agent': 'TrustBridge Job Aggregator (https://trustbridge.sl)',
+                'User-Agent': 'TrustSpan Job Aggregator (https://trustspan.sl)',
                 'Accept': 'application/json'
             }
             

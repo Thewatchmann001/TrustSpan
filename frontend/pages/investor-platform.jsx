@@ -144,7 +144,7 @@ export default function InvestorPlatformPage() {
       {/* Header Section with Background */}
       <BackgroundImage
         src="/images/backgrounds/hero/investor-hero.jpg"
-        alt="Investor Platform - TrustBridge"
+        alt="Investor Platform - TrustSpan"
         overlay="default"
         className="h-64 flex-shrink-0"
         priority={true}

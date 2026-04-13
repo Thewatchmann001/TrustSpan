@@ -79,7 +79,7 @@ class GlobalJobAPI:
             url = f"{self.remoteok_base_url}"
             
             headers = {
-                'User-Agent': 'TrustBridge Job Matcher (https://trustbridge.com)'
+                'User-Agent': 'TrustSpan Job Matcher (https://trustspan.com)'
             }
             
             response = requests.get(url, headers=headers, timeout=10)

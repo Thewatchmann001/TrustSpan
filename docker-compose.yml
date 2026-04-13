@@ -1,4 +1,4 @@
-# TrustBridge — single root Compose for local dev and GCP-friendly deployment
+# TrustSpan — single root Compose for local dev and GCP-friendly deployment
 # Usage: docker compose up -d
 # Backend: http://localhost:8000  Frontend: http://localhost:3000
 
@@ -6,15 +6,15 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_USER: trustbridge
-      POSTGRES_PASSWORD: trustbridge
-      POSTGRES_DB: trustbridgedb
+      POSTGRES_USER: trustspan
+      POSTGRES_PASSWORD: trustspan
+      POSTGRES_DB: trustspandb
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U trustbridge -d trustbridgedb"]
+      test: ["CMD-SHELL", "pg_isready -U trustspan -d trustspandb"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -24,7 +24,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql://trustbridge:trustbridge@db:5432/trustbridgedb
+      DATABASE_URL: postgresql://trustspan:trustspan@db:5432/trustspandb
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}

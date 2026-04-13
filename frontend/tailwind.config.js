@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // TrustBridge Premium Color Palette
+        // TrustSpan Premium Color Palette
         // Primary - Deep Ocean Blue (Slate)
         slate: {
           50: '#F8FAFC',

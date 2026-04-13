@@ -351,7 +351,7 @@ export default function Home() {
                 name: "Alpha Jalloh",
                 role: "Software Developer",
                 company: "TechSalone",
-                quote: "TrustBridge's AI CV builder helped me restructure my experience. I landed a senior role within two weeks of applying."
+                quote: "TrustSpan's AI CV builder helped me restructure my experience. I landed a senior role within two weeks of applying."
               },
               {
                 name: "Zainab Conteh",
@@ -449,7 +449,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-white/5 flex flex-col md:row items-center justify-between gap-4">
-          <p className="text-xs text-slate-500">© 2026 TrustBridge Sierra Leone. Built with ❤️ in Freetown.</p>
+          <p className="text-xs text-slate-500">© 2026 TrustSpan Sierra Leone. Built with ❤️ in Freetown.</p>
           <div className="flex gap-6 text-xs text-slate-500">
             <span>#1 in Career Trust</span>
             <span>Solana Native</span>

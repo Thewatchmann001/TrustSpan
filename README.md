@@ -1,4 +1,4 @@
-# TrustBridge
+# TrustSpan
 
 <div align="center">
 
@@ -42,7 +42,7 @@ _Connecting Talent with Opportunity | Empowering Global Investments_
 
 ## 🎯 Overview
 
-**TrustBridge** is an enterprise-grade platform that revolutionizes career development and investment through AI-powered technology, blockchain verification, and global market integration.
+**TrustSpan** is an enterprise-grade platform that revolutionizes career development and investment through AI-powered technology, blockchain verification, and global market integration.
 
 ### Key Capabilities
 
@@ -145,7 +145,7 @@ _Connecting Talent with Opportunity | Empowering Global Investments_
 ## 📁 Project Structure
 
 ```
-trustbridge/
+trustspan/
 ├── frontend/                 # Next.js frontend application
 │   ├── components/          # React components
 │   ├── pages/               # Next.js pages/routes
@@ -209,8 +209,8 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/trustbridge.git
-cd trustbridge
+git clone https://github.com/yourusername/trustspan.git
+cd trustspan
 ```
 
 ### 2. Backend Setup
@@ -246,11 +246,11 @@ yarn install
 
 ```bash
 # Create PostgreSQL database
-createdb trustbridge_db
+createdb trustspan_db
 
 # Or using psql:
 psql -U postgres
-CREATE DATABASE trustbridge_db;
+CREATE DATABASE trustspan_db;
 \q
 ```
 
@@ -271,7 +271,7 @@ cp .env.example .env
 
 ```env
 # Database
-DATABASE_URL=postgresql://user:password@localhost:5432/trustbridge_db
+DATABASE_URL=postgresql://user:password@localhost:5432/trustspan_db
 
 # JWT
 SECRET_KEY=your-secret-key-change-in-production
@@ -612,9 +612,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Getting Help
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/trustbridge/issues)
-- **Email**: support@trustbridge.com
-- **Discord**: [Join our community](https://discord.gg/trustbridge)
+- **Issues**: [GitHub Issues](https://github.com/yourusername/trustspan/issues)
+- **Email**: support@trustspan.com
+- **Discord**: [Join our community](https://discord.gg/trustspan)
 
 ### Reporting Bugs
 
@@ -673,17 +673,17 @@ Please use the GitHub issue tracker to report bugs. Include:
 
 ## 📊 Project Status
 
-![GitHub stars](https://img.shields.io/github/stars/yourusername/trustbridge?style=social)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/trustbridge?style=social)
-![GitHub issues](https://img.shields.io/github/issues/yourusername/trustbridge)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/trustbridge)
+![GitHub stars](https://img.shields.io/github/stars/yourusername/trustspan?style=social)
+![GitHub forks](https://img.shields.io/github/forks/yourusername/trustspan?style=social)
+![GitHub issues](https://img.shields.io/github/issues/yourusername/trustspan)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/trustspan)
 
 ---
 
 <div align="center">
 
-**Built with ❤️ by the TrustBridge Team**
+**Built with ❤️ by the TrustSpan Team**
 
-[Website](https://trustbridge.com) • [Twitter](https://twitter.com/trustbridge) • [LinkedIn](https://linkedin.com/company/trustbridge)
+[Website](https://trustspan.com) • [Twitter](https://twitter.com/trustspan) • [LinkedIn](https://linkedin.com/company/trustspan)
 
 </div>

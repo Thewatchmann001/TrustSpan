@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Initialize TrustBridge database tables"""
+"""Initialize TrustSpan database tables"""
 import sys
 import os
 
@@ -11,7 +11,7 @@ from app.db.base import Base
 from app.db.models import User, CV, Job, Startup, Investment, JobMatch, JobApplication
 
 def init_db():
-    print("🔧 Initializing TrustBridge database...")
+    print("🔧 Initializing TrustSpan database...")
     
     # Create all tables
     Base.metadata.create_all(bind=engine)

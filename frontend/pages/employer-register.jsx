@@ -165,7 +165,7 @@ export default function EmployerRegister() {
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 text-center">
-                  By submitting, you agree to TrustBridge Sierra Leone's Terms of Service for Employers.
+                  By submitting, you agree to TrustSpan Sierra Leone's Terms of Service for Employers.
                 </p>
               </div>
             )}
