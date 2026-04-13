@@ -1,8 +1,8 @@
-# 🚀 TrustBridge - Complete Setup Guide
+# 🚀 TrustSpan - Complete Setup Guide
 
-**A step-by-step guide for setting up TrustBridge from scratch**
+**A step-by-step guide for setting up TrustSpan from scratch**
 
-This guide will walk you through setting up the entire TrustBridge platform, from cloning the repository to running both frontend and backend services.
+This guide will walk you through setting up the entire TrustSpan platform, from cloning the repository to running both frontend and backend services.
 
 ---
 
@@ -111,13 +111,13 @@ Before you begin, ensure you have the following installed on your system:
 
 3. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/trustbridge.git
+   git clone https://github.com/yourusername/trustspan.git
    # Replace 'yourusername' with the actual GitHub username/organization
    ```
 
 4. **Navigate into the project directory**
    ```bash
-   cd trustbridge
+   cd trustspan
    ```
 
 5. **Verify the project structure**
@@ -253,13 +253,13 @@ psql -U postgres
 
 ```sql
 -- Create database
-CREATE DATABASE trustbridgedb;
+CREATE DATABASE trustspandb;
 
 -- Create user
-CREATE USER trustbridge WITH PASSWORD 'trustbridge';
+CREATE USER trustspan WITH PASSWORD 'trustspan';
 
 -- Grant privileges
-GRANT ALL PRIVILEGES ON DATABASE trustbridgedb TO trustbridge;
+GRANT ALL PRIVILEGES ON DATABASE trustspandb TO trustspan;
 
 -- Exit PostgreSQL
 \q
@@ -269,7 +269,7 @@ GRANT ALL PRIVILEGES ON DATABASE trustbridgedb TO trustbridge;
 
 ```bash
 # Test connection
-psql -U trustbridge -d trustbridgedb -h localhost
+psql -U trustspan -d trustspandb -h localhost
 
 # If it connects successfully, type \q to exit
 ```
@@ -307,7 +307,7 @@ psql -U trustbridge -d trustbridgedb -h localhost
 4. **Add the following configuration:**
    ```env
    # Database Configuration
-   DATABASE_URL=postgresql://trustbridge:trustbridge@localhost:5432/trustbridgedb
+   DATABASE_URL=postgresql://trustspan:trustspan@localhost:5432/trustspandb
    
    # JWT Secret Key (generate a secure random string)
    SECRET_KEY=your-secret-key-here-change-in-production
@@ -336,7 +336,7 @@ psql -U trustbridge -d trustbridgedb -h localhost
    RAPIDAPI_KEY=your-rapidapi-key
    
    # Application Settings
-   APP_NAME=TrustBridge
+   APP_NAME=TrustSpan
    APP_VERSION=1.0.0
    DEBUG=True
    
@@ -355,7 +355,7 @@ psql -U trustbridge -d trustbridgedb -h localhost
 
 ### Job Platform API Keys Setup
 
-TrustBridge integrates with multiple job platforms. Some are free and require no API keys, while others need registration:
+TrustSpan integrates with multiple job platforms. Some are free and require no API keys, while others need registration:
 
 #### Free Platforms (No API Keys Required)
 
@@ -482,7 +482,7 @@ INFO  [alembic.runtime.migration] Running upgrade xxxxx -> yyyyy, Add new column
 
 ```bash
 # Connect to database
-psql -U trustbridge -d trustbridgedb -h localhost
+psql -U trustspan -d trustspandb -h localhost
 
 # List tables
 \dt
@@ -576,7 +576,7 @@ You should see the Swagger UI with all available API endpoints.
 
 Open in your browser: `http://localhost:3000`
 
-You should see the TrustBridge landing page.
+You should see the TrustSpan landing page.
 
 ### 4. Test User Registration
 
@@ -632,7 +632,7 @@ sudo systemctl status postgresql
 sudo systemctl start postgresql
 
 # 3. Verify database exists
-sudo -u postgres psql -l | grep trustbridgedb
+sudo -u postgres psql -l | grep trustspandb
 
 # 4. Check your DATABASE_URL in backend/.env
 # Make sure it matches your PostgreSQL setup
@@ -795,7 +795,7 @@ npm start
 
 ```bash
 # Connect to database
-psql -U trustbridge -d trustbridgedb -h localhost
+psql -U trustspan -d trustspandb -h localhost
 
 # List all tables
 \dt
@@ -812,7 +812,7 @@ psql -U trustbridge -d trustbridgedb -h localhost
 ## Project Structure Overview
 
 ```
-trustbridge/
+trustspan/
 ├── backend/                 # Python FastAPI backend
 │   ├── app/                 # Main application code
 │   │   ├── api/            # API routes

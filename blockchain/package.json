@@ -1,7 +1,7 @@
 {
-  "name": "trustbridge-blockchain",
+  "name": "trustspan-blockchain",
   "version": "1.0.0",
-  "description": "TrustBridge SL - Solana-based blockchain infrastructure for verified talent pipeline",
+  "description": "TrustSpan SL - Solana-based blockchain infrastructure for verified talent pipeline",
   "main": "index.js",
   "scripts": {
     "test": "jest --testTimeout=30000",
@@ -17,10 +17,10 @@
     "solana",
     "blockchain",
     "certificates",
-    "trustbridge",
+    "trustspan",
     "sierra-leone"
   ],
-  "author": "TrustBridge SL",
+  "author": "TrustSpan SL",
   "license": "MIT",
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",

@@ -22,8 +22,8 @@ const usePrivyAuthSafe = () => {
   }
 };
 
-const PENDING_ROLE_STORAGE_KEY = "trustbridge_pending_role";
-const ROLE_MISMATCH_MESSAGE_KEY = "trustbridge_role_mismatch_message";
+const PENDING_ROLE_STORAGE_KEY = "trustspan_pending_role";
+const ROLE_MISMATCH_MESSAGE_KEY = "trustspan_role_mismatch_message";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

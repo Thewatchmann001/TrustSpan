@@ -46,7 +46,7 @@ class FreelancerProvider(BaseJobProvider):
             headers = {
                 'freelancer-oauth-v1': self.oauth_token,
                 'Content-Type': 'application/json',
-                'User-Agent': 'TrustBridge/1.0',
+                'User-Agent': 'TrustSpan/1.0',
             }
             
             # Build search query

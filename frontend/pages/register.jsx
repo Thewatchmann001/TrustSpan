@@ -23,7 +23,7 @@ const PRIVY_ENABLED =
   process.env.NEXT_PUBLIC_PRIVY_APP_ID.trim() !== "" &&
   process.env.NEXT_PUBLIC_PRIVY_APP_ID !== "your-privy-app-id";
 
-const PENDING_ROLE_STORAGE_KEY = "trustbridge_pending_role";
+const PENDING_ROLE_STORAGE_KEY = "trustspan_pending_role";
 
 export default function Register() {
   const { register, user, isAuthenticated, authError, syncFailed, clearAuthError } = useAuth();
@@ -89,7 +89,7 @@ export default function Register() {
   // Check for role mismatch message from sessionStorage (set during auto-logout)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const storedMessage = sessionStorage.getItem('trustbridge_role_mismatch_message');
+      const storedMessage = sessionStorage.getItem('trustspan_role_mismatch_message');
       if (storedMessage) {
         try {
           // Parse the stored message (it's now a JSON object)
@@ -134,7 +134,7 @@ export default function Register() {
           }
           
           // Clear the message after displaying once
-          sessionStorage.removeItem('trustbridge_role_mismatch_message');
+          sessionStorage.removeItem('trustspan_role_mismatch_message');
           console.log('📢 Displayed role mismatch toast and cleared from sessionStorage');
         } catch (e) {
           // Fallback for old string format (backward compatibility)
@@ -142,7 +142,7 @@ export default function Register() {
             duration: 6000,
             icon: '⚠️',
           });
-          sessionStorage.removeItem('trustbridge_role_mismatch_message');
+          sessionStorage.removeItem('trustspan_role_mismatch_message');
         }
       }
     }
@@ -270,7 +270,7 @@ export default function Register() {
   return (
     <BackgroundImage
       src="/images/backgrounds/hero/auth-background.jpg"
-      alt="Professional team - TrustBridge"
+      alt="Professional team - TrustSpan"
       overlay="auth"
       className="min-h-screen flex items-center justify-center p-6"
     >
@@ -298,7 +298,7 @@ export default function Register() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="text-4xl font-bold text-slate-900 mb-3"
             >
-              Join TrustBridge
+              Join TrustSpan
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}

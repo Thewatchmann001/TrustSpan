@@ -55,7 +55,7 @@ test_cv_data = {
             "technologies": ["Python Flask", "PostgreSQL", "QR Integration"]
         },
         {
-            "name": "TrustBridge SL",
+            "name": "TrustSpan SL",
             "description": "Revolutionary dual-platform combining AI-powered CV optimization and intelligent job matching with blockchain-verified investment ecosystem. Leverages OpenAI for intelligent career services, Solana blockchain for immutable verification.",
             "technologies": ["FastAPI", "OpenAI API", "Solana", "Next.js", "TypeScript"]
         }

@@ -4,7 +4,7 @@ from typing import Optional
 
 class Settings(BaseSettings):
     # Database
-    DATABASE_URL: str = "postgresql://trustbridge:trustbridge@localhost:5432/trustbridgedb"  # Override in .env for production
+    DATABASE_URL: str = "postgresql://trustspan:trustspan@localhost:5432/trustspandb"  # Override in .env for production
     
     # JWT
     SECRET_KEY: str = "your-secret-key-change-in-production"  # MUST be changed in .env for production
@@ -46,12 +46,12 @@ class Settings(BaseSettings):
     RAPIDAPI_KEY: Optional[str] = None  # Set in .env file
     
     # App
-    APP_NAME: str = "TrustBridge API"
+    APP_NAME: str = "TrustSpan API"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
     FRONTEND_URL: str = "http://localhost:3000"
     
-    # CORS: comma-separated extra origins for production (e.g. https://trustbridge-frontend-xxx.run.app)
+    # CORS: comma-separated extra origins for production (e.g. https://trustspan-frontend-xxx.run.app)
     CORS_ORIGINS: Optional[str] = None
     
     # Stripe (card payments: investor -> startup)

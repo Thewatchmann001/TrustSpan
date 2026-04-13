@@ -1,10 +1,10 @@
 #!/bin/bash
-# Database Setup Script for TrustBridge
+# Database Setup Script for TrustSpan
 # This script helps set up PostgreSQL database for the application
 
 set -e
 
-echo "🔧 TrustBridge Database Setup"
+echo "🔧 TrustSpan Database Setup"
 echo "=============================="
 echo ""
 
@@ -42,21 +42,21 @@ echo ""
 echo "Creating database and user..."
 sudo -u postgres psql <<EOF
 -- Create database if it doesn't exist
-SELECT 'CREATE DATABASE trustbridgedb'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'trustbridgedb')\gexec
+SELECT 'CREATE DATABASE trustspandb'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'trustspandb')\gexec
 
 -- Create user if it doesn't exist
 DO \$\$
 BEGIN
-    IF NOT EXISTS (SELECT FROM pg_user WHERE usename = 'trustbridge') THEN
-        CREATE USER trustbridge WITH PASSWORD 'trustbridge';
+    IF NOT EXISTS (SELECT FROM pg_user WHERE usename = 'trustspan') THEN
+        CREATE USER trustspan WITH PASSWORD 'trustspan';
     END IF;
 END
 \$\$;
 
 -- Grant privileges
-GRANT ALL PRIVILEGES ON DATABASE trustbridgedb TO trustbridge;
-ALTER DATABASE trustbridgedb OWNER TO trustbridge;
+GRANT ALL PRIVILEGES ON DATABASE trustspandb TO trustspan;
+ALTER DATABASE trustspandb OWNER TO trustspan;
 EOF
 
 echo -e "${GREEN}✅ Database and user created${NC}"

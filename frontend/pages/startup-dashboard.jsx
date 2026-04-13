@@ -154,7 +154,7 @@ export default function StartupDashboard() {
       {/* Header Section with Background */}
       <BackgroundImage
         src="/images/backgrounds/hero/startup-dashboard-hero.jpg"
-        alt="Startup Dashboard - TrustBridge"
+        alt="Startup Dashboard - TrustSpan"
         overlay="default"
         className="h-64 flex-shrink-0"
         priority={true}

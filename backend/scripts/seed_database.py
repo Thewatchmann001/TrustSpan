@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database seeding script for TrustBridge
+Database seeding script for TrustSpan
 Creates sample data for testing and development
 """
 

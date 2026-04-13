@@ -1,7 +1,7 @@
 [package]
 name = "startup-registry"
 version = "0.1.0"
-description = "TrustBridge SL Startup Registry Program"
+description = "TrustSpan SL Startup Registry Program"
 edition = "2021"
 
 [lib]

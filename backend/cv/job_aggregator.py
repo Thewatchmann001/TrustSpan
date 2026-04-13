@@ -8,7 +8,7 @@ Aggregates jobs from multiple sources for Sierra Leonean job seekers:
 - Y-Combinator Jobs (startup jobs via RapidAPI)
 - Internships (internship opportunities via RapidAPI)
 
-Built for TrustBridge - Sierra Leone job access platform
+Built for TrustSpan - Sierra Leone job access platform
 
 Enhanced with:
 - Platform-aware keyword selection
@@ -207,7 +207,7 @@ class JobAggregator:
             url = self.remoteok_base_url
             
             headers = {
-                'User-Agent': 'TrustBridge Job Aggregator (https://trustbridge.sl)'
+                'User-Agent': 'TrustSpan Job Aggregator (https://trustspan.sl)'
             }
             
             response = requests.get(url, headers=headers, timeout=10)
@@ -261,7 +261,7 @@ class JobAggregator:
         """Search Arbeitnow for remote jobs (replaced broken WWR API)."""
         try:
             headers = {
-                'User-Agent': 'TrustBridge Job Aggregator (https://trustbridge.sl)',
+                'User-Agent': 'TrustSpan Job Aggregator (https://trustspan.sl)',
                 'Accept': 'application/json'
             }
             
@@ -347,7 +347,7 @@ class JobAggregator:
             headers = {
                 'freelancer-oauth-v1': oauth_token,
                 'Content-Type': 'application/json',
-                'User-Agent': 'TrustBridge/1.0',
+                'User-Agent': 'TrustSpan/1.0',
                 'Accept': 'application/json'
             }
             
@@ -525,7 +525,7 @@ class JobAggregator:
                     #     params['where'] = location
                     
                     headers = {
-                        'User-Agent': 'TrustBridge Job Aggregator (https://trustbridge.sl)',
+                        'User-Agent': 'TrustSpan Job Aggregator (https://trustspan.sl)',
                         'Accept': 'application/json'
                     }
                     

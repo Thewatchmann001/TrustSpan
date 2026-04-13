@@ -74,7 +74,7 @@ async def create_checkout_session(
                         "currency": "usd",
                         "product_data": {
                             "name": f"Investment in {startup.name}",
-                            "description": f"TrustBridge investment · {startup.sector}",
+                            "description": f"TrustSpan investment · {startup.sector}",
                         },
                         "unit_amount": amount_cents,
                     },

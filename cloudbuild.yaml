@@ -1,27 +1,27 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-backend'
-    args: ['build', '-t', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/backend:latest', './backend']
+    args: ['build', '-t', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustspan/backend:latest', './backend']
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-frontend'
-    args: ['build', '-t', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/frontend:latest',
-           '--build-arg', 'NEXT_PUBLIC_API_URL=https://trustbridge-backend-406475861578.africa-south1.run.app',
+    args: ['build', '-t', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustspan/frontend:latest',
+           '--build-arg', 'NEXT_PUBLIC_API_URL=https://trustspan-backend-406475861578.africa-south1.run.app',
            '--build-arg', 'NEXT_PUBLIC_PRIVY_APP_ID=cmive70p803a6i90d7zu0kmou',
            '--build-arg', 'NEXT_PUBLIC_PRIVY_CLIENT_ID=client-WY6TQMatLKujsEFiybnA8a12Rcdn28ZUgzDQbsApLQDsD',
            './frontend']
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-backend'
-    args: ['push', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/backend:latest']
+    args: ['push', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustspan/backend:latest']
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-frontend'
-    args: ['push', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/frontend:latest']
+    args: ['push', 'africa-south1-docker.pkg.dev/$PROJECT_ID/trustspan/frontend:latest']
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-backend'
     entrypoint: gcloud
-    args: ['run', 'deploy', 'trustbridge-backend', '--image=africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/backend:latest', '--region=africa-south1', '--platform=managed', '--allow-unauthenticated', '--port=8000', '--memory=2Gi', '--cpu=2', '--timeout=300', '--min-instances=1', '--max-instances=5']
+    args: ['run', 'deploy', 'trustspan-backend', '--image=africa-south1-docker.pkg.dev/$PROJECT_ID/trustspan/backend:latest', '--region=africa-south1', '--platform=managed', '--allow-unauthenticated', '--port=8000', '--memory=2Gi', '--cpu=2', '--timeout=300', '--min-instances=1', '--max-instances=5']
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-frontend'
     entrypoint: gcloud
-    args: ['run', 'deploy', 'trustbridge-frontend', '--image=africa-south1-docker.pkg.dev/$PROJECT_ID/trustbridge/frontend:latest', '--region=africa-south1', '--platform=managed', '--allow-unauthenticated', '--port=3000', '--memory=512Mi', '--min-instances=0', '--max-instances=3']
+    args: ['run', 'deploy', 'trustspan-frontend', '--image=africa-south1-docker.pkg.dev/$PROJECT_ID/trustspan/frontend:latest', '--region=africa-south1', '--platform=managed', '--allow-unauthenticated', '--port=3000', '--memory=512Mi', '--min-instances=0', '--max-instances=3']
 options:
   logging: CLOUD_LOGGING_ONLY
