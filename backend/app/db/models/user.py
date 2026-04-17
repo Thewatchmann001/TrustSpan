@@ -50,9 +50,7 @@ class User(Base):
     last_login = Column(DateTime, nullable=True)
 
     # Relationships
-    # certificates removed - not part of core solutions
     startups = relationship("Startup", back_populates="founder")
-    investments = relationship("Investment", back_populates="investor")
     cvs = relationship("CV", back_populates="user")
     job_matches = relationship("JobMatch", back_populates="user")
     job_applications = relationship("JobApplication", back_populates="user")
@@ -60,4 +58,3 @@ class User(Base):
     credentials = relationship("Credential", back_populates="user", cascade="all, delete-orphan")
     trust_signals = relationship("TrustSignal", back_populates="user", cascade="all, delete-orphan")
     attestations = relationship("Attestation", back_populates="user", cascade="all, delete-orphan")
-

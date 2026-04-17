@@ -15,9 +15,6 @@ from app.core.config import settings
 from app.utils.logger import logger
 from app.api import users  # Keep users for authentication
 from app.api import messages  # Chat/messaging API
-from app.api import auth  # OAuth authentication
-from app.api.payments import router as payments_router
-from app.api.escrow import router as escrow_router
 from app.api.cv import router as cv_router
 from app.api.employers import router as employers_router
 from app.api.admin import router as admin_router
@@ -61,10 +58,7 @@ app.add_middleware(RateLimitMiddleware)
 
 # Include routers
 app.include_router(users.router)  # Keep for authentication
-app.include_router(auth.router)  # OAuth authentication (Google, etc.)
 app.include_router(messages.router)  # Chat/messaging
-app.include_router(payments_router)
-app.include_router(escrow_router)
 app.include_router(cv_router)
 app.include_router(employers_router)
 app.include_router(admin_router)

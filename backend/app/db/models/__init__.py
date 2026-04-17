@@ -3,7 +3,6 @@ from app.db.models.startup import Startup
 from app.db.models.job import Job
 from app.db.models.cv import CV
 from app.db.models.employer import Employer, EmployerStatus
-from app.db.models.investment import Investment, WithdrawalRequest
 from app.db.models.job_match import JobMatch
 from app.db.models.job_application import JobApplication
 from app.db.models.message import Conversation, Message
@@ -27,8 +26,6 @@ __all__ = [
     "CV",
     "Employer",
     "EmployerStatus",
-    "Investment",
-    "WithdrawalRequest",
     "JobMatch",
     "JobApplication",
     "Conversation",
@@ -43,4 +40,3 @@ __all__ = [
     "CredentialHash",
     "Attestation",
 ]
-

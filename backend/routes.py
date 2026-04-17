@@ -16,7 +16,7 @@ backend_dir = Path(__file__).parent
 sys.path.insert(0, str(backend_dir))
 
 from app.db.session import get_db
-from app.db.models import User, Startup, Investment, Employee
+from app.db.models import User, Startup, Employee
 from app.core.config import settings
 from app.utils.logger import logger
 from sqlalchemy import func, or_, String
