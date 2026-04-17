@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
@@ -142,48 +143,96 @@ async def upload_parse(file: UploadFile = File(...), current_user: User = Depend
     return tailored_data
 
 class CVSearchRequest(BaseModel):
-    job_title: str
-    skills: List[str]
-    experience_level: str
+    job_title: Optional[str] = None
+    skills: List[str] = []
+    experience_level: Optional[str] = "Mid"
     location: Optional[str] = None
+    education: Optional[str] = None
+    qualifications: Optional[str] = None
 
 @router.post("/search")
 async def search_cvs(request: CVSearchRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     # 1. Query all CVs
-    cvs = db.query(CV).all()
+    query = db.query(CV)
+
+    # Simple location filtering if provided
+    if request.location:
+        query = query.join(User).filter(or_(
+            CV.personal_info.op('->>')('location').ilike(f"%{request.location}%"),
+            User.university.ilike(f"%{request.location}%")
+        ))
+
+    cvs = query.all()
     results = []
 
     from app.services.matching_service import MatchingService
     matching_service = MatchingService()
 
     for cv in cvs:
-        # Use MatchingService logic for realistic scoring
-        user_skills_set = set([s.lower() for s in cv.skills.get("technical", [])]) if cv.skills else set()
+        # Normalize skills
+        user_skills_list = []
+        if cv.skills:
+            if isinstance(cv.skills, dict):
+                for cat in cv.skills.values():
+                    if isinstance(cat, list):
+                        user_skills_list.extend([str(s).lower() for s in cat])
+            elif isinstance(cv.skills, list):
+                user_skills_list = [str(s).lower() for s in cv.skills]
+
+        user_skills_set = set(user_skills_list)
 
         # Calculate skills match
-        skills_match = matching_service._calculate_skills_match_fast(request.skills, user_skills_set)
+        skills_match = matching_service._calculate_skills_match_fast(request.skills, user_skills_set) if request.skills else 1.0
 
         # Calculate experience match
         exp_years = len(cv.work_experience) if cv.work_experience else 0
         min_exp = 0
-        if request.experience_level == "Junior": min_exp = 1
+        if request.experience_level in ["Junior", "Entry"]: min_exp = 1
         elif request.experience_level == "Mid": min_exp = 3
         elif request.experience_level == "Senior": min_exp = 5
 
         experience_match = matching_service._calculate_experience_match(min_exp, exp_years)
 
-        # Combined score (Weighted)
-        match_score = int((skills_match * 0.7 + experience_match * 0.3) * 100)
+        # Education & Qualification match
+        edu_match = 1.0
+        if request.education:
+            edu_text = json.dumps(cv.education).lower() if cv.education else ""
+            edu_match = 1.0 if request.education.lower() in edu_text else 0.3
 
-        match_reason = f"Matches {int(skills_match*100)}% of required skills and {int(experience_match*100)}% of experience requirements."
+        qual_match = 1.0
+        if request.qualifications:
+            qual_text = json.dumps(cv.certifications).lower() if cv.certifications else ""
+            qual_match = 1.0 if request.qualifications.lower() in qual_text else 0.3
+
+        # Title match
+        title_match = 1.0
+        if request.job_title:
+            summary_text = (cv.summary or "").lower()
+            work_text = json.dumps(cv.work_experience).lower() if cv.work_experience else ""
+            title_match = 1.0 if (request.job_title.lower() in summary_text or request.job_title.lower() in work_text) else 0.5
+
+        # Combined score (Weighted)
+        match_score = int((skills_match * 0.4 + experience_match * 0.2 + edu_match * 0.15 + qual_match * 0.15 + title_match * 0.1) * 100)
+
+        if (request.skills or request.education or request.qualifications or request.job_title) and match_score < 30:
+            continue
+
+        match_reason = f"Matches {int(skills_match*100)}% skills and {int(experience_match*100)}% experience."
+        if edu_match > 0.8 and request.education: match_reason += " Matches education."
 
         results.append({
             "cv_id": cv.id,
+            "user_id": cv.user_id,
             "name": cv.personal_info.get("full_name") if cv.personal_info else "Hidden Name",
-            "skills": cv.skills.get("technical", []) if cv.skills else [],
+            "skills": user_skills_list[:10],
             "experience_years": exp_years,
             "match_score": match_score,
-            "match_reason": match_reason
+            "match_reason": match_reason,
+            "personal_info": cv.personal_info,
+            "summary": cv.summary,
+            "work_experience": cv.work_experience,
+            "education": cv.education,
+            "certifications": cv.certifications
         })
 
     # Rank by match score
