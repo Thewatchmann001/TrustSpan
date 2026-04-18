@@ -16,7 +16,7 @@ import Logo from "../components/Logo";
 import PasswordInput from "../components/PasswordInput";
 import BackgroundImage from "../components/BackgroundImage";
 import { Keypair } from "@solana/web3.js";
-import { authAPI } from "../lib/api";
+import { authAPI } from "../utils/api";
 
 const PRIVY_ENABLED =
   typeof process.env.NEXT_PUBLIC_PRIVY_APP_ID === "string" &&

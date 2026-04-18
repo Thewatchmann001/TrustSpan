@@ -9,7 +9,7 @@
 import { useState, useEffect } from 'react';
 import { Briefcase, MapPin, Building2, ExternalLink, Loader, Search, Sparkles, AlertCircle, ChevronDown, ChevronUp, CheckCircle2, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cvAPI } from '../lib/api';
+import { cvAPI } from '../utils/api';
 import toast from 'react-hot-toast';
 import { useJobs } from '../contexts/JobsContext';
 

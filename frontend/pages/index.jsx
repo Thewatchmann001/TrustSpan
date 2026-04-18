@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../components/Logo";
-import { authAPI } from "../lib/api";
+import { authAPI } from "../utils/api";
 
 export default function Home() {
   const [stats, setStats] = useState(null);

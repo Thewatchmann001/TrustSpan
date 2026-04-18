@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
-import { employerAPI, cvAPI } from "../lib/api";
+import { employerAPI, cvAPI } from "../utils/api";
 import toast from "react-hot-toast";
 import { Search, Users, Star, MapPin, Briefcase, Filter, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";

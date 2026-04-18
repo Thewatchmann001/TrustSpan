@@ -1,7 +1,4 @@
-# TrustSpan — single root Compose for local dev and GCP-friendly deployment
-# Usage: docker compose up -d
-# Backend: http://localhost:8000  Frontend: http://localhost:3000
-
+version: '3.3'
 services:
   db:
     image: postgres:15-alpine
@@ -13,41 +10,32 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U trustspan -d trustspandb"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgresql://trustspan:trustspan@db:5432/trustspandb
-      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
-      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
-      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      SECRET_KEY: change-me-in-production
+      FRONTEND_URL: http://localhost:3000
+      STRIPE_SECRET_KEY: ""
+      STRIPE_WEBHOOK_SECRET: ""
+      MISTRAL_API_KEY: ""
     ports:
       - "8000:8000"
     depends_on:
-      db:
-        condition: service_healthy
-
+      - db
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        NEXT_PUBLIC_API_URL: http://localhost:8000
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NEXT_PUBLIC_API_URL: http://localhost:8000
     ports:
       - "3000:3000"
     depends_on:
       - backend
-
 volumes:
   postgres_data: {}

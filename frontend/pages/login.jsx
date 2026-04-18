@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import Logo from '../components/Logo';
 import PasswordInput from '../components/PasswordInput';
 import BackgroundImage from '../components/BackgroundImage';
-import { authAPI } from '../lib/api';
+import { authAPI } from '../utils/api';
 
 const PRIVY_ENABLED =
   typeof process.env.NEXT_PUBLIC_PRIVY_APP_ID === "string" &&

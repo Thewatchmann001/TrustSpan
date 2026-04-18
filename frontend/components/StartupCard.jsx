@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Building2, MapPin, Users, TrendingUp, Award, X, ExternalLink, Shield } from "lucide-react";
-import { startupAPI } from "../lib/api";
+import { startupAPI } from "../utils/api";
 import toast from "react-hot-toast";
 import { AttestationBadgeList } from "./attestation/AttestationBadge";
 

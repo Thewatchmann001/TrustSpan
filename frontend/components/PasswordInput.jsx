@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Eye, EyeOff, Lock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
-import { validatePasswordStrength, calculatePasswordStrength } from '../lib/validation';
+import { validatePasswordStrength, calculatePasswordStrength } from '../utils/validation';
 
 export default function PasswordInput({ 
   value, 

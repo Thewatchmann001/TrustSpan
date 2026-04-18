@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
-import { adminAPI } from "../lib/api";
+import { adminAPI } from "../utils/api";
 import toast from "react-hot-toast";
 import { Users, FileText, Building2, CheckCircle, XCircle, Shield, BarChart3, Eye } from "lucide-react";
 import { motion } from "framer-motion";
