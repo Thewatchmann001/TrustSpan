@@ -159,9 +159,9 @@ export default function Register() {
     if (isAuthenticated && user) {
       const role = user.role || "student";
       if (role === "founder" || role === "startup") {
-        router.push("/startup-dashboard");
+        router.push("/cv-builder");
       } else if (role === "investor") {
-        router.push("/investor-platform");
+        router.push("/cv-builder");
       } else {
         router.push("/cv-builder");
       }
@@ -248,9 +248,9 @@ export default function Register() {
         toast.success("Registration successful!");
         // Redirect based on user role
         if (formData.role === "founder" || formData.role === "startup") {
-          router.push("/startup-dashboard");
+          router.push("/cv-builder");
         } else if (formData.role === "investor") {
-          router.push("/investor-platform");
+          router.push("/cv-builder");
         } else {
           router.push("/cv-builder");
         }

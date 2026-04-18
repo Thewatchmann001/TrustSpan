@@ -34,9 +34,9 @@ export default function AuthCallback() {
 
       // Redirect based on role
       if (role === 'founder' || role === 'startup') {
-        router.push('/startup-dashboard');
+        router.push('/cv-builder');
       } else if (role === 'investor') {
-        router.push('/investor-platform');
+        router.push('/cv-builder');
       } else {
         router.push('/cv-builder');
       }

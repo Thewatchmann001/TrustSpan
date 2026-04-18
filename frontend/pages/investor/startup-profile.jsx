@@ -21,7 +21,7 @@ export default function StartupProfilePage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 mb-4">No startup ID provided</p>
-          <Link href="/investor-platform" className="text-blue-600 hover:underline">
+          <Link href="/cv-builder" className="text-blue-600 hover:underline">
             ← Back to Investments
           </Link>
         </div>
@@ -33,7 +33,7 @@ export default function StartupProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Link
-          href="/investor-platform"
+          href="/cv-builder"
           className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -67,7 +67,7 @@ export default function StartupProfilePage() {
               investorId={user?.id}
               onSuccess={() => {
                 setShowInvestFlow(false);
-                router.push("/investor-platform");
+                router.push("/cv-builder");
               }}
             />
           </div>

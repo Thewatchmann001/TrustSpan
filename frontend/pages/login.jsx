@@ -137,9 +137,9 @@ export default function Login() {
       let redirectPath = '/cv-builder';
       
       if (role === 'founder' || role === 'startup') {
-        redirectPath = '/startup-dashboard';
+        redirectPath = '/cv-builder';
       } else if (role === 'investor') {
-        redirectPath = '/investor-platform';
+        redirectPath = '/cv-builder';
       }
       
       console.log('🚀 Redirecting to:', redirectPath);
@@ -162,9 +162,9 @@ export default function Login() {
       // Redirect based on user role
       const role = result.user?.role || 'student';
       if (role === 'founder' || role === 'startup') {
-        router.push('/startup-dashboard');
+        router.push('/cv-builder');
       } else if (role === 'investor') {
-        router.push('/investor-platform');
+        router.push('/cv-builder');
       } else {
         router.push('/cv-builder');
       }
