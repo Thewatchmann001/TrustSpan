@@ -132,18 +132,8 @@ export default function Login() {
     }
     
     if (isAuthenticated && user) {
-      console.log('✅ User authenticated, redirecting...', { role: user.role, userId: user.id });
-      const role = user.role || 'student';
-      let redirectPath = '/cv-builder';
-      
-      if (role === 'founder' || role === 'startup') {
-        redirectPath = '/cv-builder';
-      } else if (role === 'investor') {
-        redirectPath = '/cv-builder';
-      }
-      
-      console.log('🚀 Redirecting to:', redirectPath);
-      router.push(redirectPath);
+      console.log('✅ User authenticated, redirecting to CV Builder...');
+      router.push('/cv-builder');
     }
   }, [isAuthenticated, user, router, authError, syncFailed]);
 
@@ -159,15 +149,7 @@ export default function Login() {
     
     if (result.success) {
       toast.success('Login successful!');
-      // Redirect based on user role
-      const role = result.user?.role || 'student';
-      if (role === 'founder' || role === 'startup') {
-        router.push('/cv-builder');
-      } else if (role === 'investor') {
-        router.push('/cv-builder');
-      } else {
-        router.push('/cv-builder');
-      }
+      router.push('/cv-builder');
     } else {
       toast.error(result.error || 'Login failed');
     }

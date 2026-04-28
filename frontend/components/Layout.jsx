@@ -53,8 +53,7 @@ export default function Layout({ children }) {
   const handleRoleSwitch = async (newRole) => {
     const result = await switchRole(newRole);
     if (result.success && result.active_role) {
-      const path = result.active_role === "student" ? "/cv-builder" : result.active_role === "founder" ? "/startup-dashboard" : "/investor-platform";
-      router.push(path);
+      router.push("/cv-builder");
     }
   };
 

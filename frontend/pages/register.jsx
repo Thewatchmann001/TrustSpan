@@ -157,14 +157,7 @@ export default function Register() {
     }
     
     if (isAuthenticated && user) {
-      const role = user.role || "student";
-      if (role === "founder" || role === "startup") {
-        router.push("/cv-builder");
-      } else if (role === "investor") {
-        router.push("/cv-builder");
-      } else {
-        router.push("/cv-builder");
-      }
+      router.push("/cv-builder");
     }
   }, [isAuthenticated, user, router, authError, syncFailed]);
 
@@ -246,14 +239,7 @@ export default function Register() {
       
       if (result.success) {
         toast.success("Registration successful!");
-        // Redirect based on user role
-        if (formData.role === "founder" || formData.role === "startup") {
-          router.push("/cv-builder");
-        } else if (formData.role === "investor") {
-          router.push("/cv-builder");
-        } else {
-          router.push("/cv-builder");
-        }
+        router.push("/cv-builder");
       } else {
         const errorMsg = result.error || "Registration failed";
         console.error('❌ Registration failed:', errorMsg);
@@ -306,7 +292,7 @@ export default function Register() {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="text-slate-600 font-medium"
             >
-              Build Your Career, Invest in Your Future
+              Build Your Career, Build Your Future
             </motion.p>
           </div>
 
