@@ -13,14 +13,15 @@ alembic==1.12.1
 python-dotenv==1.0.0
 passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.3.0
+
 # Blockchain
 solana>=0.30.0
 solders>=0.18.0
 
 # PDF Parsing for CV Upload
-PyPDF2>=3.0.0
 pdfplumber>=0.10.0
 python-magic>=0.4.27
+
 requests==2.31.0
 feedparser==6.0.11
 pytest==7.4.3
@@ -34,6 +35,7 @@ google-auth-oauthlib>=1.1.0
 google-auth-httplib2>=0.1.1
 
 # Job Matching Engine Dependencies
-numpy>=2.4.0
-sentence-transformers>=5.2.0
+# torch is installed separately in Dockerfile as CPU-only to avoid pulling CUDA (~1.5GB)
+numpy>=2.0.0
+sentence-transformers>=3.0.0
 stripe>=10.0.0
